@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Teen Finance Guidance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="nav-bar">
+        <div class="logo" style="cursor: pointer; font-weight: 800; color: var(--primary);"
+            onclick="window.location.href='home.html'">Teen<span style="color: #c9973a;">Finance</span></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="dashboard.html" class="nav-item active">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </a>
+            <button id="logout-btn" class="nav-item" style="background:none; border:none; cursor:pointer;">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <main class="dashboard-grid">
+        <section class="glass-card animate-fade-in"
+            style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 3rem; flex-wrap: wrap;">
+            <div style="position: relative; width: 200px; height: 200px;">
+                <canvas id="completionChart"></canvas>
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                    <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" id="progress-percent">0%
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);">Complete</div>
+                </div>
+            </div>
+            <div>
+                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">Module Progress</h3>
+                <div style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted);">Overall Mastery</div>
+                <p id="completed-modules" style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.5rem;"></p>
+                <div style="display: flex; gap: 1.5rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary);"></div>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Completed</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <div
+                            style="width: 12px; height: 12px; border-radius: 50%; background: #edf2f7; border: 1px solid var(--border);">
+                        </div>
+                        <span style="font-size: 0.85rem; color: var(--text-muted);">Remaining</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="glass-card animate-fade-in" id="experience-section">
+            <h2 id="module-title">Your Learning Path</h2>
+            <p id="module-desc" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
+            <div id="lessons-list" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Lessons will be injected here -->
+            </div>
+        </section>
+
+
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const userData = JSON.parse(localStorage.getItem('user'));
+        if (!userData) window.location.href = 'login.html';
+
+        async function loadDashboard() {
+            try {
+                const guidance = await API.recommendation.getGuidance();
+                const progress = await API.dashboard.getProgress();
+
+                document.getElementById('module-title').textContent = guidance.title;
+
+                const lessonsList = document.getElementById('lessons-list');
+                lessonsList.innerHTML = guidance.lessons.map(lesson => {
+                    const isDone = progress.find(p => p.module_name === lesson.id && p.status === 'completed');
+                    return `
+                        <div class="glass-card" style="padding: 1rem; border-color: ${isDone ? 'var(--accent)' : 'var(--glass-border)'}; display: flex; gap: 1rem; align-items: center;">
+                            <img src="${lesson.image}" style="width: 100px; height: 60px; border-radius: 8px; object-fit: cover;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                    <div>
+                                        <h4 style="margin-bottom: 0.2rem;">${lesson.title}</h4>
+                                        <p style="font-size: 0.85rem; color: var(--text-secondary);">${lesson.desc}</p>
+                                    </div>
+                                    ${isDone ? '<span style="color: var(--accent); font-size: 1.2rem;">✓</span>' :
+                            `<button onclick="window.location.href='lessons.html?id=${lesson.id}'" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Start</button>`}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+
+
+                // Update Progress UI
+                const completedCount = progress.filter(p => p.status === 'completed').length;
+                const totalModules = guidance.lessons.length;
+                const percent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
+
+                document.getElementById('progress-percent').textContent = `${percent}%`;
+
+                if (completedCount > 0) {
+                    document.getElementById('completed-modules').textContent = `${completedCount} modules finished.`;
+                } else {
+                    document.getElementById('completed-modules').textContent = "No modules finished yet.";
+                }
+
+                initCharts(percent);
+
+            } catch (err) {
+                console.error(err);
+                if (err.message === 'Unauthorized') window.location.href = '../login.html';
+            }
+        }
+
+        function initCharts(percent) {
+            // Completion Doughnut
+            const completionCtx = document.getElementById('completionChart').getContext('2d');
+            new Chart(completionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Remaining'],
+                    datasets: [{
+                        data: [percent, 100 - percent],
+                        backgroundColor: ['#6b46c1', '#edf2f7'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '80%',
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        async function startLesson(moduleId) {
+            // Simulate completing a lesson for now
+            if (confirm(`Do you want to complete the "${moduleId}" module?`)) {
+                try {
+                    await API.dashboard.updateProgress({ module_name: moduleId, status: 'completed', score: 100 });
+                    loadDashboard();
+                } catch (err) {
+                    alert('Failed to update progress');
+                }
+            }
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await API.auth.logout();
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        loadDashboard();
+    </script>
+</body>
+
+</html>

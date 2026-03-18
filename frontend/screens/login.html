@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teen Finance Guidance - Login / Sign Up</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="nav-bar">
+        <div class="logo">TeenFinance</div>
+    </div>
+
+    <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+        <div class="glass-card animate-fade-in" style="width: 100%; max-width: 450px;">
+            <h1 id="form-title" style="margin-bottom: 0.5rem;">Join the Journey</h1>
+            <p id="form-subtitle" style="color: var(--text-muted); margin-bottom: 2rem;">Master your finances from day
+                one.</p>
+
+            <form id="auth-form">
+                <div class="input-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" required placeholder="Enter username">
+                </div>
+                <div class="input-group" id="age-group">
+                    <label for="age">Age</label>
+                    <input type="number" id="age" min="10" max="100" placeholder="Your age">
+                </div>
+                <div class="input-group" id="skills-group">
+                    <label for="skills">Skills (comma separated)</label>
+                    <input type="text" id="skills" placeholder="e.g. Coding, Design, Writing">
+                </div>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+
+                <div id="auth-error"
+                    style="color: var(--error); margin-bottom: 1rem; font-size: 0.9rem; display: none;"></div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="submit-btn">Register</button>
+
+                <p style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+                    <span id="switch-text">Already have an account?</span>
+                    <a href="#" id="switch-auth"
+                        style="color: var(--primary); text-decoration: none; font-weight: 600;">Log In</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const form = document.getElementById('auth-form');
+        const switchAuth = document.getElementById('switch-auth');
+        const ageGroup = document.getElementById('age-group');
+        const skillsGroup = document.getElementById('skills-group');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const authError = document.getElementById('auth-error');
+
+        let isLogin = false;
+
+        switchAuth.addEventListener('click', (e) => {
+            e.preventDefault();
+            isLogin = !isLogin;
+            authError.style.display = 'none';
+            authError.textContent = '';
+
+            if (isLogin) {
+                formTitle.textContent = "Welcome Back";
+                submitBtn.textContent = "Log In";
+                ageGroup.style.display = 'none';
+                skillsGroup.style.display = 'none';
+                switchAuth.textContent = "Sign Up";
+                document.getElementById('switch-text').textContent = "Don't have an account?";
+            } else {
+                formTitle.textContent = "Join the Journey";
+                submitBtn.textContent = "Register";
+                ageGroup.style.display = 'block';
+                skillsGroup.style.display = 'block';
+                switchAuth.textContent = "Log In";
+                document.getElementById('switch-text').textContent = "Already have an account?";
+            }
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            authError.style.display = 'none';
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                if (isLogin) {
+                    const res = await API.auth.login({ username, password });
+                    localStorage.setItem('user', JSON.stringify(res.user));
+                    window.location.href = 'home.html';
+                } else {
+                    const age = document.getElementById('age').value;
+                    const skills = document.getElementById('skills').value;
+                    await API.auth.register({ username, password, age, skills });
+                    alert('Registration successful! Please log in.');
+                    switchAuth.click();
+                }
+            } catch (err) {
+                authError.textContent = err.message;
+                authError.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>

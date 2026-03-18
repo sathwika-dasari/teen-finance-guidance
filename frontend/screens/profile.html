@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Teen Finance Guidance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="nav-bar">
+        <div class="logo" style="font-weight: 800; color: var(--primary);">Teen<span
+                style="color: #c9973a;">Finance</span></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="profile.html" class="nav-item active">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </a>
+            <button id="logout-btn" class="nav-item" style="background:none; border:none; cursor:pointer;">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <main style="padding: 2rem; display: flex; justify-content: center;">
+        <div style="width: 100%; max-width: 800px; display: flex; flex-direction: column; gap: 1.5rem;">
+
+            <!-- Profile Hero Card -->
+            <div class="glass-card animate-fade-in"
+                style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; padding: 2.5rem;">
+                <div style="display: flex; align-items: center; gap: 2rem;">
+                    <div
+                        style="width: 90px; height: 90px; border-radius: 50%; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: white; border: 3px solid rgba(255,255,255,0.4); flex-shrink: 0;">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div>
+                        <h2 id="profile-username"
+                            style="font-size: 1.8rem; font-weight: 800; color: white; margin-bottom: 0.3rem;">--</h2>
+                        <p id="profile-age" style="color: rgba(255,255,255,0.8); font-size: 1rem;"></p>
+                        <span
+                            style="display: inline-block; margin-top: 0.5rem; background: rgba(255,255,255,0.2); padding: 0.2rem 0.8rem; border-radius: 20px; font-size: 0.8rem; color: white;">🎓
+                            Teen Learner</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Badges Card -->
+            <div class="glass-card animate-fade-in">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 700;">🏅 My Badges</h3>
+                <div id="badges-container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+                </div>
+            </div>
+
+            <!-- Update Profile Card -->
+            <div class="glass-card animate-fade-in">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 700;">✏️ Update Profile</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label for="new-age">Age</label>
+                        <input type="number" id="new-age" min="10" max="100" placeholder="Update your age">
+                    </div>
+                    <div class="input-group" style="margin-bottom: 0;">
+                        <label for="new-skills">Skills</label>
+                        <input type="text" id="new-skills" placeholder="e.g. Coding, Design">
+                    </div>
+                </div>
+                <div id="update-msg" style="font-size: 0.9rem; margin-top: 1rem; display: none;"></div>
+                <button class="btn btn-primary" style="width: 100%; margin-top: 1.2rem;" onclick="updateProfile()">Save
+                    Changes</button>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = 'login.html';
+
+        document.getElementById('profile-username').textContent = user.username;
+        document.getElementById('profile-age').textContent = `Age: ${user.age}`;
+
+        async function loadBadges() {
+            const streakData = JSON.parse(localStorage.getItem('streakData')) || { count: 0 };
+            const progress = await API.dashboard.getProgress();
+            const guidance = await API.recommendation.getGuidance();
+
+            const totalModules = guidance.lessons.length;
+            const completedCount = progress.filter(p => p.status === 'completed').length;
+            const percent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
+
+            const badges = [
+                {
+                    id: 'halfway',
+                    icon: '⭐',
+                    title: 'Half Way There',
+                    desc: 'Completed 50% of modules',
+                    earned: percent >= 50
+                },
+                {
+                    id: 'streak5',
+                    icon: '🔥',
+                    title: '5 Day Streak',
+                    desc: 'Visited 5 days in a row',
+                    earned: streakData.count >= 5
+                }
+            ];
+
+            const container = document.getElementById('badges-container');
+            container.innerHTML = badges.map(badge => `
+                <div style="
+                    display: flex; align-items: center; gap: 1.2rem;
+                    padding: 1.2rem; border-radius: 12px;
+                    border: 2px solid ${badge.earned ? 'var(--primary)' : 'var(--border)'};
+                    background: ${badge.earned ? '#fdf5ff' : '#f7fafc'};
+                    opacity: ${badge.earned ? '1' : '0.6'};">
+                    <div style="width: 55px; height: 55px; border-radius: 50%; background: ${badge.earned ? 'var(--primary)' : '#e2e8f0'}; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0;">
+                        ${badge.icon}
+                    </div>
+                    <div>
+                        <div style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">${badge.title}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.2rem;">${badge.desc}</div>
+                        <div style="margin-top: 0.4rem;">
+                            ${badge.earned
+                    ? '<span style="font-size: 0.75rem; color: var(--primary); font-weight: 600; background: #ede9fe; padding: 0.15rem 0.6rem; border-radius: 20px;">✓ Earned</span>'
+                    : '<span style="font-size: 0.75rem; color: var(--text-muted); background: #e2e8f0; padding: 0.15rem 0.6rem; border-radius: 20px;">🔒 Locked</span>'}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await API.auth.logout();
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        async function updateProfile() {
+            const newAge = document.getElementById('new-age').value;
+            const newSkills = document.getElementById('new-skills').value;
+            const msg = document.getElementById('update-msg');
+
+            if (!newAge && !newSkills) {
+                msg.style.display = 'block';
+                msg.style.color = 'var(--error)';
+                msg.textContent = 'Please fill in at least one field.';
+                return;
+            }
+
+            try {
+                await API.auth.updateProfile({ age: newAge, skills: newSkills });
+
+                if (newAge) user.age = newAge;
+                if (newSkills) user.skills = newSkills;
+                localStorage.setItem('user', JSON.stringify(user));
+
+                document.getElementById('profile-age').textContent = `Age: ${user.age}`;
+
+                msg.style.display = 'block';
+                msg.style.color = 'var(--success)';
+                msg.textContent = '✓ Profile updated! Content will refresh on next visit.';
+                setTimeout(() => msg.style.display = 'none', 3000);
+
+            } catch (err) {
+                msg.style.display = 'block';
+                msg.style.color = 'var(--error)';
+                msg.textContent = 'Update failed. Please try again.';
+            }
+        }
+
+        loadBadges();
+    </script>
+</body>
+
+</html>

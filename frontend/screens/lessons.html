@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson - Teen Finance Guidance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="nav-bar">
+        <div class="logo">TeenFinance</div>
+        <a href="dashboard.html" class="btn btn-secondary" style="text-decoration: none;">Back to Dashboard</a>
+    </div>
+
+    <main style="padding: 2rem; display: flex; justify-content: center;">
+        <div class="glass-card animate-fade-in" style="width: 100%; max-width: 800px;">
+            <div id="lesson-header" style="border-radius: 15px; overflow: hidden; margin-bottom: 2rem;">
+                <img id="lesson-cover" src="" style="width: 100%; height: 250px; object-fit: cover; display: block;">
+                <div style="padding: 1.2rem 0.5rem 0.5rem 0.5rem;">
+                    <h1 id="lesson-title" style="font-size: 1.6rem; font-weight: 800; color: var(--text-main);">
+                        Loading...</h1>
+                </div>
+            </div>
+
+            <div id="lesson-content"
+                style="line-height: 1.6; color: var(--text-main); font-size: 1.1rem; margin-bottom: 3rem;">
+                <!-- Lesson text will be injected here -->
+            </div>
+
+            <div id="quiz-section" class="glass-card" style="display: none; border-color: var(--primary);">
+                <h3>Quick Quiz</h3>
+                <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Test what you've learned.</p>
+                <div id="quiz-container">
+                    <!-- Quiz cards will be injected here -->
+                </div>
+                <button id="submit-quiz" class="btn btn-secondary" style="margin-top: 1.5rem; width: 100%;">Submit
+                    Quiz</button>
+            </div>
+
+            <button id="start-quiz-btn" class="btn btn-primary" style="width: 100%;">I've read the lesson, take
+                quiz</button>
+        </div>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const lessonId = urlParams.get('id');
+        let currentLesson = null;
+
+        async function loadLesson() {
+            if (!lessonId) {
+                window.location.href = 'dashboard.html';
+                return;
+            }
+
+            try {
+                currentLesson = await API.recommendation.getLesson(lessonId);
+
+                document.getElementById('lesson-title').textContent = currentLesson.title;
+                document.getElementById('lesson-cover').src = currentLesson.image;
+
+                const container = document.getElementById('lesson-content');
+
+                container.innerHTML = `
+            <div id="topics-list" style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px;"></div>
+            <div id="topic-content" class="glass-card" style="padding:20px; margin-top:20px; display:none;"></div>
+        `;
+
+                const topicsList = document.getElementById('topics-list');
+                const topicContent = document.getElementById('topic-content');
+
+                currentLesson.topics.forEach((topic, index) => {
+
+                    const btn = document.createElement("button");
+                    btn.style.cssText = `
+    width: 100%; text-align: left; padding: 1rem 1.2rem;
+    background: #f7fafc; border: 1px solid var(--border);
+    border-radius: 10px; font-size: 1rem; font-weight: 600;
+    color: var(--text-main); cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center;
+    transition: all 0.2s ease;
+`;
+                    btn.innerHTML = `<span>${topic.title}</span><span style="font-size:1.2rem; color:var(--primary);">+</span>`;
+                    btn.onmouseover = () => btn.style.background = '#edf2f7';
+                    btn.onmouseout = () => btn.style.background = '#f7fafc';
+
+                    btn.onclick = () => {
+                        topicContent.style.display = "block";
+                        topicContent.innerHTML = `
+    <h3 style="font-size:1.1rem; font-weight:700; color:var(--primary); margin-bottom:0.8rem;">${topic.title}</h3>
+    <p style="line-height:1.8; color:var(--text-main); font-size:0.97rem;">${topic.content}</p>
+`;
+                    };
+
+                    topicsList.appendChild(btn);
+
+                });
+
+                if (lessonId === 'scam_prevention' && currentLesson.scam_game) {
+                    renderScamGame(currentLesson.scam_game);
+                }
+
+                renderQuiz();
+
+            } catch (err) {
+                console.error(err);
+                alert('Failed to load lesson content');
+            }
+        }
+        function renderScamGame(cases) {
+            const container = document.getElementById('lesson-content');
+            let currentCase = 0;
+            let score = 0;
+
+            const gameDiv = document.createElement('div');
+            gameDiv.style.marginTop = '2rem';
+            gameDiv.innerHTML = `
+                <div style="background: linear-gradient(135deg, #e53e3e, #c53030); color: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; text-align: center;">
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">🕵️</div>
+                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.3rem;">Scam Detective Challenge</h3>
+                    <p style="opacity: 0.9; font-size: 0.9rem;">Can you spot the scam? Review each case and decide!</p>
+                    <div style="margin-top: 1rem; background: rgba(255,255,255,0.2); border-radius: 8px; padding: 0.5rem;">
+                        <span id="case-counter" style="font-weight: 700;">Case 1 of ${cases.length}</span> &nbsp;|&nbsp;
+                        <span style="font-weight: 700;">Score: </span><span id="scam-score">0</span>
+                    </div>
+                </div>
+
+                <!-- Progress Bar -->
+                <div style="background: #edf2f7; border-radius: 10px; height: 8px; margin-bottom: 1.5rem;">
+                    <div id="scam-progress" style="background: #e53e3e; height: 8px; border-radius: 10px; width: ${100 / cases.length}%; transition: width 0.3s ease;"></div>
+                </div>
+
+                <!-- Case Card -->
+                <div id="current-case-card" class="glass-card" style="padding: 1.5rem;"></div>
+
+                <!-- Result Screen -->
+                <div id="scam-result" style="display: none; text-align: center; padding: 2rem; background: #f0fff4; border: 2px solid #38a169; border-radius: 12px; margin-top: 1rem;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;" id="scam-result-emoji">🏆</div>
+                    <h3 id="scam-result-title" style="font-weight: 800; margin-bottom: 0.5rem;"></h3>
+                    <p id="scam-result-desc" style="color: var(--text-muted);"></p>
+                </div>
+            `;
+            container.appendChild(gameDiv);
+
+            function renderCase(index) {
+                const c = cases[index];
+                const card = document.getElementById('current-case-card');
+                card.style.borderColor = 'var(--border)';
+                card.style.borderWidth = '1px';
+
+                card.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem;">
+                        <span style="background: #fff3cd; color: #856404; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">📋 ${c.type}</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Case #${index + 1}</span>
+                    </div>
+                    <div style="background: #1a1a2e; color: #e0e0e0; border-radius: 10px; padding: 1.2rem; margin-bottom: 1.2rem; font-family: monospace; font-size: 0.9rem; line-height: 1.6;">
+                        ${c.scenario}
+                    </div>
+                    <p style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--text-main);">Is this a scam?</p>
+                    <div style="display: flex; gap: 1rem;" id="answer-btns">
+                        <button id="scam-btn" onclick="checkAnswer(true)" style="
+                            flex: 1; padding: 0.8rem; border-radius: 10px;
+                            border: 2px solid #e53e3e; background: #fff5f5;
+                            color: #e53e3e; font-weight: 700; font-size: 0.95rem;
+                            cursor: pointer; transition: all 0.2s ease;"
+                            onmouseover="this.style.background='#e53e3e'; this.style.color='white'"
+                            onmouseout="this.style.background='#fff5f5'; this.style.color='#e53e3e'">
+                            🚨 Yes, It's a Scam!
+                        </button>
+                        <button id="legit-btn" onclick="checkAnswer(false)" style="
+                            flex: 1; padding: 0.8rem; border-radius: 10px;
+                            border: 2px solid #38a169; background: #f0fff4;
+                            color: #38a169; font-weight: 700; font-size: 0.95rem;
+                            cursor: pointer; transition: all 0.2s ease;"
+                            onmouseover="this.style.background='#38a169'; this.style.color='white'"
+                            onmouseout="this.style.background='#f0fff4'; this.style.color='#38a169'">
+                            ✅ Looks Legit
+                        </button>
+                    </div>
+                    <div id="explanation-box" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: 10px; font-size: 0.88rem; line-height: 1.6;"></div>
+                    <button id="next-btn" style="display: none; width: 100%; margin-top: 1rem;" class="btn btn-primary" onclick="nextCase()">
+                        ${index + 1 < cases.length ? 'Next Case →' : 'See Final Score 🏆'}
+                    </button>
+                `;
+            }
+
+            window.checkAnswer = function (userSaidScam) {
+                const c = cases[currentCase];
+                const isCorrect = userSaidScam === c.is_scam;
+                if (isCorrect) score++;
+
+                document.getElementById('scam-score').textContent = score;
+
+                // Disable buttons
+                document.getElementById('scam-btn').disabled = true;
+                document.getElementById('legit-btn').disabled = true;
+                document.getElementById('scam-btn').style.cursor = 'default';
+                document.getElementById('legit-btn').style.cursor = 'default';
+                document.getElementById('scam-btn').onmouseover = null;
+                document.getElementById('legit-btn').onmouseover = null;
+                document.getElementById('scam-btn').onmouseout = null;
+                document.getElementById('legit-btn').onmouseout = null;
+
+                // Show explanation
+                const explanation = document.getElementById('explanation-box');
+                explanation.style.display = 'block';
+                explanation.style.background = isCorrect ? '#f0fff4' : '#fff5f5';
+                explanation.style.border = `1px solid ${isCorrect ? '#38a169' : '#e53e3e'}`;
+                explanation.innerHTML = `
+                    <div style="font-weight: 700; color: ${isCorrect ? '#38a169' : '#e53e3e'}; margin-bottom: 0.5rem;">
+                        ${isCorrect ? '✅ Correct!' : '❌ Wrong!'}
+                    </div>
+                    <div style="color: var(--text-main);">${c.explanation}</div>
+                `;
+
+                // Update card border
+                const card = document.getElementById('current-case-card');
+                card.style.borderColor = isCorrect ? '#38a169' : '#e53e3e';
+                card.style.borderWidth = '2px';
+
+                // Show next button
+                document.getElementById('next-btn').style.display = 'block';
+            };
+
+            window.nextCase = function () {
+                currentCase++;
+
+                if (currentCase < cases.length) {
+                    // Update progress bar and counter
+                    document.getElementById('scam-progress').style.width = `${((currentCase + 1) / cases.length) * 100}%`;
+                    document.getElementById('case-counter').textContent = `Case ${currentCase + 1} of ${cases.length}`;
+                    renderCase(currentCase);
+                } else {
+                    // Show final result
+                    document.getElementById('current-case-card').style.display = 'none';
+                    const resultDiv = document.getElementById('scam-result');
+                    resultDiv.style.display = 'block';
+                    const percent = Math.round((score / cases.length) * 100);
+
+                    if (percent >= 80) {
+                        document.getElementById('scam-result-emoji').textContent = '🏆';
+                        document.getElementById('scam-result-title').textContent = `Excellent Detective! ${score}/${cases.length}`;
+                        document.getElementById('scam-result-desc').textContent = 'You can spot scams like a pro! Stay safe online.';
+                    } else if (percent >= 60) {
+                        document.getElementById('scam-result-emoji').textContent = '👍';
+                        document.getElementById('scam-result-title').textContent = `Good Job! ${score}/${cases.length}`;
+                        document.getElementById('scam-result-desc').textContent = 'You are getting better at spotting scams. Keep learning!';
+                    } else {
+                        document.getElementById('scam-result-emoji').textContent = '📚';
+                        document.getElementById('scam-result-title').textContent = `Keep Practicing! ${score}/${cases.length}`;
+                        document.getElementById('scam-result-desc').textContent = 'Review the lesson topics and try again to improve your scam detection skills!';
+                    }
+                    resultDiv.scrollIntoView({ behavior: 'smooth' });
+                }
+            };
+
+            renderCase(0);
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quiz-container');
+            container.innerHTML = currentLesson.quiz.map((q, qIndex) => `
+                <div style="margin-bottom: 1.5rem;">
+                    <p style="margin-bottom: 0.8rem; font-weight: 600;">${q.q}</p>
+                    <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        ${q.a.map((opt, oIndex) => `
+                            <label class="glass-card" style="padding: 0.8rem; display: flex; align-items: center; gap: 0.8rem; cursor: pointer;">
+                                <input type="radio" name="q${qIndex}" value="${oIndex}">
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('start-quiz-btn').addEventListener('click', () => {
+            document.getElementById('quiz-section').style.display = 'block';
+            document.getElementById('start-quiz-btn').style.display = 'none';
+            document.getElementById('quiz-section').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        document.getElementById('submit-quiz').addEventListener('click', async () => {
+            const answers = currentLesson.quiz.map((q, i) => {
+                const selected = document.querySelector(`input[name="q${i}"]:checked`);
+                return selected ? parseInt(selected.value) : null;
+            });
+
+            if (answers.includes(null)) {
+                alert('Please answer all questions!');
+                return;
+            }
+
+            const correctCount = answers.filter((a, i) => a === currentLesson.quiz[i].correct).length;
+            const score = Math.round((correctCount / currentLesson.quiz.length) * 100);
+
+            if (score >= 70) {
+                alert(`Excellent! You scored ${score}%. Lesson completed.`);
+                try {
+                    await API.dashboard.updateProgress({ module_name: lessonId, status: 'completed', score: score });
+                    window.location.href = 'dashboard.html';
+                } catch (err) {
+                    alert('Failed to save progress');
+                }
+            } else {
+                alert(`You scored ${score}%. Try reading the lesson again and re-take the quiz!`);
+            }
+        });
+
+        loadLesson();
+    </script>
+</body>
+
+</html>

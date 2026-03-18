@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Teen Finance Guidance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="nav-bar">
+        <div class="logo" style="font-weight: 800; color: var(--primary);">Teen<span
+                style="color: #c9973a;">Finance</span></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-item active">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </a>
+            <button id="logout-btn" class="nav-item" style="background:none; border:none; cursor:pointer;">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="hero-section">
+        <h1 id="welcome-msg">Welcome Back!</h1>
+        <p>Your personalized path to financial mastery.</p>
+    </div>
+
+    <main style="max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem 2rem;">
+        <section class="glass-card animate-fade-in" style="margin-bottom: 2rem; text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <span style="font-size: 1.5rem;">🔥</span>
+                <span id="streak-count" style="font-size: 1.4rem; font-weight: 800; color: var(--primary);">0 day
+                    streak</span>
+            </div>
+            <div id="streak-circles" style="display: flex; justify-content: center; gap: 0.6rem;"></div>
+        </section>
+
+        <section>
+            <h2 style="margin-bottom: 1rem;">Recommended for You</h2>
+            <div id="module-grid" class="module-cover-grid">
+                <!-- Modules will be injected here -->
+            </div>
+        </section>
+
+        <section style="margin-top: 2rem; display: none;" id="parttime-section">
+            <div class="daily-practice-card animate-fade-in" onclick="window.location.href='parttime.html'"
+                style="border-color: #c9973a;">
+                <i class="fas fa-briefcase" style="font-size: 2.5rem; color: #c9973a; margin-bottom: 1rem;"></i>
+                <h2>Part-Time Guidance</h2>
+                <p style="color: var(--text-muted);">Discover part-time opportunities based on your skills and
+                    interests.</p>
+                <button class="btn" style="margin-top: 1rem; background: #c9973a; color: white;">Explore
+                    Options</button>
+            </div>
+        </section>
+
+        <section style="margin-top: 3rem;">
+            <div class="daily-practice-card animate-fade-in" onclick="startDailyPractice()">
+                <i class="fas fa-graduation-cap"
+                    style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                <h2>Daily Practice</h2>
+                <p style="color: var(--text-muted);">Quick 2-minute quiz to keep your finance skills sharp.</p>
+                <button class="btn btn-primary" style="margin-top: 1rem;">Start Quiz</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = 'login.html';
+
+        document.getElementById('welcome-msg').textContent = `Welcome Back, ${user.username}!`;
+
+        async function loadHome() {
+            try {
+                const guidance = await API.recommendation.getGuidance();
+                const grid = document.getElementById('module-grid');
+
+                grid.innerHTML = guidance.lessons.map(lesson => `
+                    <div class="module-cover-card animate-fade-in" onclick="window.location.href='lessons.html?id=${lesson.id}'">
+                        <img src="${lesson.image}" alt="${lesson.title}">
+                        <div class="module-cover-overlay">
+                            <h3>${lesson.title}</h3>
+                            <p style="font-size: 0.8rem; opacity: 0.9;">${lesson.desc}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                if (user.age >= 18) {
+                    document.getElementById('parttime-section').style.display = 'block';
+                }
+
+            } catch (err) {
+                console.error(err);
+                if (err.message === 'Unauthorized') window.location.href = 'login.html';
+            }
+        }
+
+        function startDailyPractice() {
+            window.location.href = 'daily_practice.html';
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await API.auth.logout();
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        function loadStreak() {
+            const today = new Date().toDateString();
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            let streakData = JSON.parse(localStorage.getItem('streakData')) || { dates: [], count: 0, lastVisit: null };
+
+            if (streakData.lastVisit !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+
+                if (streakData.lastVisit === yesterday.toDateString()) {
+                    streakData.count += 1;
+                } else {
+                    streakData.count = 1;
+                }
+
+                streakData.dates.push(today);
+                if (streakData.dates.length > 7) streakData.dates = streakData.dates.slice(-7);
+                streakData.lastVisit = today;
+                localStorage.setItem('streakData', JSON.stringify(streakData));
+            }
+
+            document.getElementById('streak-count').textContent = `${streakData.count} day streak`;
+
+            const circlesContainer = document.getElementById('streak-circles');
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                last7Days.push(d);
+            }
+
+            circlesContainer.innerHTML = last7Days.map(d => {
+                const isActive = streakData.dates.includes(d.toDateString());
+                const dayName = days[d.getDay()];
+                return `
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 0.3rem;">
+                        <div style="
+                            width: 38px; height: 38px; border-radius: 50%;
+                            background: ${isActive ? 'var(--primary)' : '#edf2f7'};
+                            border: 2px solid ${isActive ? 'var(--primary)' : 'var(--border)'};
+                            display: flex; align-items: center; justify-content: center;
+                            font-size: 1rem;">
+                            ${isActive ? '🔥' : ''}
+                        </div>
+                        <span style="font-size: 0.7rem; color: var(--text-muted); font-weight: 600;">${dayName}</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        loadStreak();
+        loadHome();
+    </script>
+
+    <!-- AI Chat Bubble -->
+    <div id="chat-bubble" onclick="toggleChat()" style="
+    position: fixed; bottom: 2rem; right: 2rem;
+    width: 55px; height: 55px; border-radius: 50%;
+    background: var(--primary); color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; cursor: pointer; z-index: 1000;
+    box-shadow: 0 4px 15px rgba(107,70,193,0.4);
+    transition: transform 0.2s ease;">
+        💬
+    </div>
+
+    <div id="chat-window" style="
+    display: none; position: fixed; bottom: 6rem; right: 2rem;
+    width: 340px; height: 450px; background: white;
+    border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    z-index: 1000; flex-direction: column; overflow: hidden;
+    border: 1px solid var(--border);">
+        <div
+            style="background: var(--primary); padding: 1rem 1.2rem; color: white; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="font-weight: 700; font-size: 1rem;">💰 FinanceBot</div>
+                <div style="font-size: 0.75rem; opacity: 0.85;">Your personal finance assistant</div>
+            </div>
+            <span onclick="toggleChat()" style="cursor: pointer; font-size: 1.2rem;">✕</span>
+        </div>
+        <div id="chat-messages"
+            style="flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+            <div class="bot-msg"
+                style="background: #f0ebff; padding: 0.8rem 1rem; border-radius: 12px 12px 12px 0; font-size: 0.88rem; color: var(--text-main); max-width: 85%;">
+                Hi! I'm FinanceBot 👋 Ask me anything about budgeting, saving, investing or earning money!
+            </div>
+        </div>
+        <div style="padding: 0.8rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem;">
+            <input id="chat-input" type="text" placeholder="Ask a finance question..."
+                style="flex: 1; border: 1px solid var(--border); border-radius: 8px; padding: 0.6rem 0.8rem; font-size: 0.88rem; outline: none; font-family: inherit;">
+            <button onclick="sendMessage()"
+                style="background: var(--primary); color: white; border: none; border-radius: 8px; padding: 0.6rem 1rem; cursor: pointer; font-size: 0.9rem;">➤</button>
+        </div>
+    </div>
+
+    <script>
+        const GEMINI_API_KEY = 'AIzaSyC-Hb1IHHPVM2dtyy3YzVeL-lf-_S0Zqe8';
+
+        function toggleChat() {
+            const win = document.getElementById('chat-window');
+            win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        document.getElementById('chat-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        function appendMessage(text, isUser) {
+            const messages = document.getElementById('chat-messages');
+            const div = document.createElement('div');
+            div.style.cssText = `
+                padding: 0.8rem 1rem; border-radius: ${isUser ? '12px 12px 0 12px' : '12px 12px 12px 0'};
+                font-size: 0.88rem; max-width: 85%; word-wrap: break-word;
+                background: ${isUser ? 'var(--primary)' : '#f0ebff'};
+                color: ${isUser ? 'white' : 'var(--text-main)'};
+                align-self: ${isUser ? 'flex-end' : 'flex-start'};
+            `;
+            div.textContent = text;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chat-input');
+            const userText = input.value.trim();
+            if (!userText) return;
+
+            appendMessage(userText, true);
+            input.value = '';
+            appendMessage('Thinking...', false);
+
+            try {
+                const response = await fetch(
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GEMINI_API_KEY}`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: `You are FinanceBot, a friendly teen finance assistant. Answer only finance-related questions about budgeting, saving, investing, and earning money. Keep answers short and simple. Question: ${userText}`
+                                }]
+                            }]
+                        })
+                    }
+                );
+
+                const data = await response.json();
+                console.log('API Response:', data);
+
+                if (!data.candidates || data.candidates.length === 0) {
+                    const messages = document.getElementById('chat-messages');
+                    messages.lastChild.remove();
+                    appendMessage('FinanceBot is busy, please try again in a moment!', false);
+                    return;
+                }
+
+                const botReply = data.candidates[0].content.parts[0].text;
+                const messages = document.getElementById('chat-messages');
+                messages.lastChild.remove();
+                appendMessage(botReply, false);
+
+            } catch (err) {
+                const messages = document.getElementById('chat-messages');
+                messages.lastChild.remove();
+                appendMessage('Error: ' + err.message, false);
+                console.log('Full error:', err);
+            }
+        }
+    </script>
+</body>
+
+</html>

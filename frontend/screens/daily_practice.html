@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Practice - Teen Finance Guidance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="nav-bar">
+        <div class="logo" style="font-weight: 800; color: var(--primary);">Teen<span
+                style="color: #c9973a;">Finance</span></div>
+        <div class="nav-links">
+            <a href="home.html" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="profile.html" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </a>
+            <button id="logout-btn" class="nav-item" style="background:none; border:none; cursor:pointer;">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </div>
+
+    <main style="padding: 2rem; display: flex; justify-content: center;">
+        <div class="glass-card animate-fade-in" style="width: 100%; max-width: 650px;">
+
+            <!-- Header -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: var(--primary);"></i>
+                <h2 style="margin-top: 0.8rem; font-size: 1.6rem; font-weight: 800;">Daily Practice</h2>
+                <p style="color: var(--text-muted); margin-top: 0.3rem;">10 quick questions to sharpen your finance
+                    skills!</p>
+            </div>
+
+            <!-- Progress Bar -->
+            <div style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted);">Question <span id="current-q">1</span>
+                        of 10</span>
+                    <span style="font-size: 0.85rem; color: var(--primary); font-weight: 600;" id="score-display">Score:
+                        0</span>
+                </div>
+                <div style="background: #edf2f7; border-radius: 10px; height: 8px;">
+                    <div id="progress-bar"
+                        style="background: var(--primary); height: 8px; border-radius: 10px; width: 10%; transition: width 0.3s ease;">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Card -->
+            <div id="question-card">
+                <p id="question-text" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 1.5rem;"></p>
+                <div id="options-container" style="display: flex; flex-direction: column; gap: 0.8rem;"></div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" style="display: none; text-align: center;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;" id="result-emoji">🎉</div>
+                <h2 id="result-title" style="font-size: 1.6rem; font-weight: 800; margin-bottom: 0.5rem;"></h2>
+                <p id="result-desc" style="color: var(--text-muted); margin-bottom: 2rem;"></p>
+                <div style="font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 2rem;"
+                    id="final-score"></div>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="restartQuiz()">Try
+                    Again</button>
+                <a href="home.html" class="btn btn-secondary"
+                    style="width: 100%; display: block; text-decoration: none; text-align: center;">Back to Home</a>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const questions = [
+            { q: "What is a budget?", a: ["A type of bank account", "A plan for managing income and expenses", "A government tax", "A type of loan"], correct: 1 },
+            { q: "What does 'saving' money mean?", a: ["Spending all your money", "Investing in stocks", "Setting aside money for future use", "Borrowing money from a bank"], correct: 2 },
+            { q: "What is interest?", a: ["A fee charged for borrowing money", "Free money from the bank", "A type of savings account", "A government benefit"], correct: 0 },
+            { q: "What is inflation?", a: ["A rise in the value of money", "A decrease in prices over time", "A general increase in prices over time", "A type of investment"], correct: 2 },
+            { q: "What is a credit score?", a: ["Your bank balance", "A number showing how reliable you are at repaying debt", "The amount of credit cards you have", "Your monthly income"], correct: 1 },
+            { q: "What is a stock?", a: ["A type of loan", "Ownership share in a company", "A government bond", "A savings account"], correct: 1 },
+            { q: "What does 'net income' mean?", a: ["Total income before taxes", "Income after taxes and deductions", "Money saved in a bank", "Total business revenue"], correct: 1 },
+            { q: "What is an emergency fund?", a: ["Money invested in stocks", "A loan for emergencies", "Savings set aside for unexpected expenses", "A type of insurance"], correct: 2 },
+            { q: "What is a debit card?", a: ["A card that lets you borrow money", "A card linked to your savings that spends your own money", "A card with a credit limit", "A prepaid gift card"], correct: 1 },
+            { q: "What is diversification in investing?", a: ["Putting all money in one stock", "Spreading investments to reduce risk", "Only investing in gold", "Keeping all money in cash"], correct: 1 },
+            { q: "What is a mutual fund?", a: ["A loan from a bank", "A pooled investment managed by professionals", "A government savings scheme", "A type of insurance"], correct: 1 },
+            { q: "What does APR stand for?", a: ["Annual Profit Rate", "Annual Percentage Rate", "Average Payment Rate", "Actual Price Ratio"], correct: 1 },
+            { q: "What is compound interest?", a: ["Interest on the original amount only", "Interest earned on both principal and accumulated interest", "A fixed monthly fee", "A type of tax"], correct: 1 },
+            { q: "What is a liability?", a: ["Something you own", "Money in your savings", "A debt or financial obligation", "Your monthly income"], correct: 2 },
+            { q: "What is an asset?", a: ["A debt you owe", "Something of value that you own", "A monthly expense", "A type of tax"], correct: 1 },
+            { q: "What is a dividend?", a: ["A type of loan", "A share of company profits paid to investors", "A government tax", "A monthly bank fee"], correct: 1 },
+            { q: "What does 'liquid asset' mean?", a: ["An asset that is difficult to sell", "Cash or something easily converted to cash", "A type of investment", "A bank loan"], correct: 1 },
+            { q: "What is a 401(k)?", a: ["A type of credit card", "A retirement savings plan", "A government tax form", "A type of loan"], correct: 1 },
+            { q: "What is the stock market?", a: ["A place to buy groceries", "A marketplace where company shares are bought and sold", "A government bank", "A type of savings account"], correct: 1 },
+            { q: "What is a bond?", a: ["A share in a company", "A loan made to a company or government", "A type of savings account", "A credit card"], correct: 1 },
+            { q: "What is gross income?", a: ["Income after all deductions", "Total income before any deductions", "Monthly take-home pay", "Annual savings"], correct: 1 },
+            { q: "What is a tax deduction?", a: ["Extra tax you pay", "An amount subtracted from taxable income", "A government fine", "A type of investment"], correct: 1 },
+            { q: "What is net worth?", a: ["Your monthly salary", "Total assets minus total liabilities", "Money in your bank account", "Your credit score"], correct: 1 },
+            { q: "What is a recession?", a: ["A period of economic growth", "A period of significant economic decline", "A type of investment strategy", "A government policy"], correct: 1 },
+            { q: "What is insurance?", a: ["A type of investment", "Protection against financial loss", "A government tax", "A savings account"], correct: 1 }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+        let answered = false;
+
+        function seededShuffle(arr) {
+            const today = new Date();
+            const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+            let currentSeed = seed;
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                currentSeed = (currentSeed * 1664525 + 1013904223) & 0xffffffff;
+                const j = Math.abs(currentSeed) % (i + 1);
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        const dailyQuestions = seededShuffle(questions).slice(0, 10);
+
+        function loadQuestion() {
+            answered = false;
+            const q = dailyQuestions[currentIndex];
+            document.getElementById('question-text').textContent = `${currentIndex + 1}. ${q.q}`;
+            document.getElementById('current-q').textContent = currentIndex + 1;
+            document.getElementById('progress-bar').style.width = `${((currentIndex + 1) / 10) * 100}%`;
+
+            const container = document.getElementById('options-container');
+            container.innerHTML = q.a.map((opt, i) => `
+                <button onclick="selectAnswer(${i})" id="opt-${i}" style="
+                    width: 100%; text-align: left; padding: 0.9rem 1.2rem;
+                    background: #f7fafc; border: 2px solid var(--border);
+                    border-radius: 10px; font-size: 0.95rem; font-weight: 500;
+                    color: var(--text-main); cursor: pointer;
+                    transition: all 0.2s ease;">
+                    ${opt}
+                </button>
+            `).join('');
+        }
+
+        function selectAnswer(selected) {
+            if (answered) return;
+            answered = true;
+
+            const correct = dailyQuestions[currentIndex].correct;
+            const buttons = document.querySelectorAll('[id^="opt-"]');
+
+            buttons.forEach((btn, i) => {
+                btn.style.cursor = 'default';
+                if (i === correct) {
+                    btn.style.background = '#c6f6d5';
+                    btn.style.borderColor = '#38a169';
+                    btn.style.color = '#276749';
+                } else if (i === selected && selected !== correct) {
+                    btn.style.background = '#fed7d7';
+                    btn.style.borderColor = '#e53e3e';
+                    btn.style.color = '#c53030';
+                }
+            });
+
+            if (selected === correct) score++;
+            document.getElementById('score-display').textContent = `Score: ${score}`;
+
+            setTimeout(() => {
+                currentIndex++;
+                if (currentIndex < 10) {
+                    loadQuestion();
+                } else {
+                    showResult();
+                }
+            }, 1000);
+        }
+
+        function showResult() {
+            document.getElementById('question-card').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'block';
+            document.getElementById('final-score').textContent = `${score}/10`;
+
+            if (score >= 8) {
+                document.getElementById('result-emoji').textContent = '🏆';
+                document.getElementById('result-title').textContent = 'Excellent!';
+                document.getElementById('result-desc').textContent = 'You are a finance pro! Keep it up!';
+            } else if (score >= 5) {
+                document.getElementById('result-emoji').textContent = '👍';
+                document.getElementById('result-title').textContent = 'Good Job!';
+                document.getElementById('result-desc').textContent = 'Keep practicing to improve your score!';
+            } else {
+                document.getElementById('result-emoji').textContent = '📚';
+                document.getElementById('result-title').textContent = 'Keep Learning!';
+                document.getElementById('result-desc').textContent = 'Review the lessons and try again!';
+            }
+        }
+
+        function restartQuiz() {
+            currentIndex = 0;
+            score = 0;
+            document.getElementById('question-card').style.display = 'block';
+            document.getElementById('result-screen').style.display = 'none';
+            document.getElementById('score-display').textContent = 'Score: 0';
+            loadQuestion();
+        }
+
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        });
+
+        loadQuestion();
+    </script>
+</body>
+
+</html>
