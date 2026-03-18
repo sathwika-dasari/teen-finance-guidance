@@ -100,7 +100,7 @@
                 if (isLogin) {
                     const res = await API.auth.login({ username, password });
                     localStorage.setItem('user', JSON.stringify(res.user));
-                    window.location.href = 'home.html';
+                    window.location.href = '/screens/home.html';;
                 } else {
                     const age = document.getElementById('age').value;
                     const skills = document.getElementById('skills').value;
