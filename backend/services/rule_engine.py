@@ -7,6 +7,11 @@ class RuleEngine:
             "title": ""
         }
 
+        try:
+            age = int(age)
+        except (ValueError, TypeError):
+            age = 0
+
         if age < 18:
             recommendations["title"] = "Financial Literacy for Teens"
             recommendations["lessons"] = [
@@ -23,18 +28,33 @@ class RuleEngine:
             ]
             
             # Skills-based guidance
+            from .career_content import CAREER_DATA
+            
             skills_list = [s.strip().lower() for s in skills.split(',')]
+            matched_ids = []
             
             if 'coding' in skills_list or 'programming' in skills_list:
-                recommendations["guidance"].append({"id": "freelance_dev", "title": "Freelance Web Development", "desc": "Start earning by building websites for local businesses."})
+                matched_ids.append("freelance_dev")
             
             if 'design' in skills_list or 'art' in skills_list:
-                recommendations["guidance"].append({"id": "graphic_design", "title": "Graphic Design Gigs", "desc": "Monetize your creative skills on platforms like Upwork."})
+                matched_ids.append("graphic_design")
                 
             if 'writing' in skills_list or 'editing' in skills_list:
-                recommendations["guidance"].append({"id": "content_writing", "title": "Content Writing", "desc": "Write articles and blogs to build your portfolio and income."})
+                matched_ids.append("content_writing")
+
+            if 'teaching' in skills_list or 'tutoring' in skills_list:
+                matched_ids.append("online_tutor")
+
+            if 'marketing' in skills_list or 'social' in skills_list:
+                matched_ids.append("social_media_manager")
             
-            if not recommendations["guidance"]:
-                recommendations["guidance"].append({"id": "general_freelance", "title": "Virtual Assistant", "desc": "High demand for general organizational and administrative support."})
+            if not matched_ids:
+                matched_ids.append("virtual_assistant")
+
+            for cid in matched_ids:
+                if cid in CAREER_DATA:
+                    data = CAREER_DATA[cid].copy()
+                    data["id"] = cid
+                    recommendations["guidance"].append(data)
 
         return recommendations

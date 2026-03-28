@@ -10,19 +10,24 @@
 </head>
 
 <body>
-    <div class="nav-bar">
-        <div class="logo" style="font-weight: 800; color: var(--primary);">Teen<span
-                style="color: #c9973a;">Finance</span></div>
-        <div class="nav-links">
-            <a href="home.html" class="nav-item">
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/home'">
+            <i class="fas fa-rocket"></i>
+            Teen<span>Finance</span>
+        </div>
+        <button class="mobile-nav-toggle" id="nav-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="nav-menu">
+            <a href="/home" class="nav-item">
                 <i class="fas fa-home nav-icon"></i>
                 <span>Home</span>
             </a>
-            <a href="dashboard.html" class="nav-item">
+            <a href="/dashboard" class="nav-item">
                 <i class="fas fa-chart-line nav-icon"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="profile.html" class="nav-item">
+            <a href="/profile" class="nav-item">
                 <i class="fas fa-user nav-icon"></i>
                 <span>Profile</span>
             </a>
@@ -31,9 +36,9 @@
                 <span>Logout</span>
             </button>
         </div>
-    </div>
+    </nav>
 
-    <main style="padding: 2rem; display: flex; justify-content: center;">
+    <main class="layout-container" style="display: flex; justify-content: center; align-items: center; min-height: calc(100vh - 72px);">
         <div class="glass-card animate-fade-in" style="width: 100%; max-width: 650px;">
 
             <!-- Header -->
@@ -52,9 +57,9 @@
                     <span style="font-size: 0.85rem; color: var(--primary); font-weight: 600;" id="score-display">Score:
                         0</span>
                 </div>
-                <div style="background: #edf2f7; border-radius: 10px; height: 8px;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 10px; height: 8px; border: 1px solid var(--border);">
                     <div id="progress-bar"
-                        style="background: var(--primary); height: 8px; border-radius: 10px; width: 10%; transition: width 0.3s ease;">
+                        style="background: var(--gradient-hero); height: 8px; border-radius: 10px; width: 10%; transition: width 0.3s ease; box-shadow: 0 0 10px var(--primary-glow);">
                     </div>
                 </div>
             </div>
@@ -74,14 +79,26 @@
                     id="final-score"></div>
                 <button class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;" onclick="restartQuiz()">Try
                     Again</button>
-                <a href="home.html" class="btn btn-secondary"
+                <a href="/home" class="btn btn-secondary"
                     style="width: 100%; display: block; text-decoration: none; text-align: center;">Back to Home</a>
             </div>
 
         </div>
     </main>
 
+    <script src="../js/api.js"></script>
     <script>
+        // Mobile Nav Toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                navToggle.querySelector('i').classList.toggle('fa-bars');
+                navToggle.querySelector('i').classList.toggle('fa-times');
+            });
+        }
+
         const questions = [
             { q: "What is a budget?", a: ["A type of bank account", "A plan for managing income and expenses", "A government tax", "A type of loan"], correct: 1 },
             { q: "What does 'saving' money mean?", a: ["Spending all your money", "Investing in stocks", "Setting aside money for future use", "Borrowing money from a bank"], correct: 2 },
@@ -138,12 +155,7 @@
 
             const container = document.getElementById('options-container');
             container.innerHTML = q.a.map((opt, i) => `
-                <button onclick="selectAnswer(${i})" id="opt-${i}" style="
-                    width: 100%; text-align: left; padding: 0.9rem 1.2rem;
-                    background: #f7fafc; border: 2px solid var(--border);
-                    border-radius: 10px; font-size: 0.95rem; font-weight: 500;
-                    color: var(--text-main); cursor: pointer;
-                    transition: all 0.2s ease;">
+                <button onclick="selectAnswer(${i})" id="opt-${i}" class="quiz-option">
                     ${opt}
                 </button>
             `).join('');
@@ -159,13 +171,9 @@
             buttons.forEach((btn, i) => {
                 btn.style.cursor = 'default';
                 if (i === correct) {
-                    btn.style.background = '#c6f6d5';
-                    btn.style.borderColor = '#38a169';
-                    btn.style.color = '#276749';
+                    btn.classList.add('correct');
                 } else if (i === selected && selected !== correct) {
-                    btn.style.background = '#fed7d7';
-                    btn.style.borderColor = '#e53e3e';
-                    btn.style.color = '#c53030';
+                    btn.classList.add('incorrect');
                 }
             });
 
@@ -213,7 +221,7 @@
 
         document.getElementById('logout-btn').addEventListener('click', () => {
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         });
 
         loadQuestion();

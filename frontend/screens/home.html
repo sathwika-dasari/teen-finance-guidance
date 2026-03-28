@@ -10,19 +10,24 @@
 </head>
 
 <body>
-    <div class="nav-bar">
-        <div class="logo" style="font-weight: 800; color: var(--primary);">Teen<span
-                style="color: #c9973a;">Finance</span></div>
-        <div class="nav-links">
-            <a href="home.html" class="nav-item active">
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/home'">
+            <i class="fas fa-rocket"></i>
+            Teen<span>Finance</span>
+        </div>
+        <button class="mobile-nav-toggle" id="nav-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="nav-menu">
+            <a href="/home" class="nav-item active">
                 <i class="fas fa-home nav-icon"></i>
                 <span>Home</span>
             </a>
-            <a href="dashboard.html" class="nav-item">
+            <a href="/dashboard" class="nav-item">
                 <i class="fas fa-chart-line nav-icon"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="profile.html" class="nav-item">
+            <a href="/profile" class="nav-item">
                 <i class="fas fa-user nav-icon"></i>
                 <span>Profile</span>
             </a>
@@ -31,14 +36,15 @@
                 <span>Logout</span>
             </button>
         </div>
-    </div>
+    </nav>
 
-    <div class="hero-section">
-        <h1 id="welcome-msg">Welcome Back!</h1>
-        <p>Your personalized path to financial mastery.</p>
-    </div>
+    <main class="layout-container">
+        <!-- ── HERO SECTION ── -->
+        <div class="hero-section animate-fade-in">
+            <h1 class="text-gradient" id="welcome-text">Explore Finance</h1>
+            <p>Master the skills to build your future today.</p>
+        </div>
 
-    <main style="max-width: 1200px; margin: 0 auto; padding: 0 2rem 3rem 2rem;">
         <section class="glass-card animate-fade-in" style="margin-bottom: 2rem; text-align: center;">
             <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
                 <span style="font-size: 1.5rem;">🔥</span>
@@ -53,10 +59,18 @@
             <div id="module-grid" class="module-cover-grid">
                 <!-- Modules will be injected here -->
             </div>
+            
+            <!-- Above 18 Path Guidance Section -->
+            <div id="guidance-section" style="margin-top: 3rem; display: none;">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.5rem; font-weight: 700;">Career Path Guidance (18+)</h3>
+                <div id="guidance-grid" class="module-cover-grid">
+                    <!-- Guidance items will be injected here -->
+                </div>
+            </div>
         </section>
 
         <section style="margin-top: 2rem; display: none;" id="parttime-section">
-            <div class="daily-practice-card animate-fade-in" onclick="window.location.href='parttime.html'"
+            <div class="daily-practice-card animate-fade-in" onclick="window.location.href='/parttime'"
                 style="border-color: #c9973a;">
                 <i class="fas fa-briefcase" style="font-size: 2.5rem; color: #c9973a; margin-bottom: 1rem;"></i>
                 <h2>Part-Time Guidance</h2>
@@ -66,6 +80,8 @@
                     Options</button>
             </div>
         </section>
+
+
 
         <section style="margin-top: 3rem;">
             <div class="daily-practice-card animate-fade-in" onclick="startDailyPractice()">
@@ -80,10 +96,23 @@
 
     <script src="../js/api.js"></script>
     <script>
-        const user = JSON.parse(localStorage.getItem('user'));
-        if (!user) window.location.href = 'login.html';
+        // Mobile Nav Toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                navToggle.querySelector('i').classList.toggle('fa-bars');
+                navToggle.querySelector('i').classList.toggle('fa-times');
+            });
+        }
 
-        document.getElementById('welcome-msg').textContent = `Welcome Back, ${user.username}!`;
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = '/login';
+
+        // Set welcome message using the correct element ID
+        const welcomeEl = document.getElementById('welcome-text');
+        if (welcomeEl && user) welcomeEl.textContent = `Welcome Back, ${user.username}! 👋`;
 
         async function loadHome() {
             try {
@@ -91,7 +120,7 @@
                 const grid = document.getElementById('module-grid');
 
                 grid.innerHTML = guidance.lessons.map(lesson => `
-                    <div class="module-cover-card animate-fade-in" onclick="window.location.href='lessons.html?id=${lesson.id}'">
+                    <div class="module-cover-card animate-fade-in" onclick="window.location.href='/lessons?id=${lesson.id}'">
                         <img src="${lesson.image}" alt="${lesson.title}">
                         <div class="module-cover-overlay">
                             <h3>${lesson.title}</h3>
@@ -100,24 +129,55 @@
                     </div>
                 `).join('');
 
-                if (user.age >= 18) {
-                    document.getElementById('parttime-section').style.display = 'block';
+                if (user && parseInt(user.age) >= 18) {
+                    // Show the Part-Time Guidance banner
+                    const parttimeSection = document.getElementById('parttime-section');
+                    if (parttimeSection) parttimeSection.style.display = 'block';
+
+                    const guidanceSection = document.getElementById('guidance-section');
+                    const guidanceGrid = document.getElementById('guidance-grid');
+                    const guidanceItems = guidance.guidance || [];
+
+                    if (guidanceItems.length > 0 && guidanceSection && guidanceGrid) {
+                        guidanceSection.style.display = 'block';
+                        guidanceGrid.innerHTML = guidanceItems.map(item => `
+                            <div class="module-cover-card animate-fade-in" onclick="window.location.href='/parttime?job=${item.id}'" style="border: 1px solid var(--border); background: var(--surface); height: auto; min-height: 300px; display: flex; flex-direction: column; cursor: pointer;">
+                                <div style="padding: 2rem 1.5rem; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center;">
+                                    <div style="width: 55px; height: 55px; border-radius: 50%; background: var(--primary-glow); margin: 0 auto 1.2rem; display: flex; align-items: center; justify-content: center; font-size: 1.8rem;">
+                                        <span>${item.icon || '🚀'}</span>
+                                    </div>
+                                    <h3 style="margin-bottom: 0.5rem; font-weight: 700; font-size: 1.1rem;">${item.title}</h3>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; margin-bottom: 1.5rem;">${item.desc}</p>
+                                    
+                                    <div style="display: flex; gap: 0.6rem; justify-content: center; margin-top: auto;">
+                                        <a href="${item.youtube}" target="_blank" class="btn btn-secondary btn-sm" style="flex: 1; padding: 0.5rem; font-size: 0.75rem; background: rgba(255,0,0,0.1); border-color: rgba(255,0,0,0.2); color: #ff4d4d; display: flex; align-items: center; justify-content: center; gap: 0.3rem;" onclick="event.stopPropagation()">
+                                            <i class="fab fa-youtube"></i> Video
+                                        </a>
+                                        <button class="btn btn-primary btn-sm" style="flex: 1; padding: 0.5rem; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; gap: 0.3rem;" onclick="event.stopPropagation(); window.location.href='/lessons?id=${item.lesson_id}'">
+                                            <i class="fas fa-book-open"></i> Lesson
+                                        </button>
+                                    </div>
+                                    <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--primary); font-weight: 600;">View Full Roadmap →</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
                 }
 
             } catch (err) {
                 console.error(err);
-                if (err.message === 'Unauthorized') window.location.href = 'login.html';
+                if (err.message === 'Unauthorized') window.location.href = '/login';
             }
         }
 
         function startDailyPractice() {
-            window.location.href = 'daily_practice.html';
+            window.location.href = '/daily';
         }
 
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await API.auth.logout();
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         });
 
         function loadStreak() {
@@ -188,11 +248,14 @@
     </div>
 
     <div id="chat-window" style="
-    display: none; position: fixed; bottom: 6rem; right: 2rem;
-    width: 340px; height: 450px; background: white;
-    border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.15);
-    z-index: 1000; flex-direction: column; overflow: hidden;
-    border: 1px solid var(--border);">
+    display: none; position: fixed; bottom: 85px; right: 2rem; z-index: 10001; 
+    width: 320px; height: 420px; 
+    background: rgba(15, 15, 26, 0.95); 
+    backdrop-filter: blur(20px); 
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+    flex-direction: column; overflow: hidden;">
         <div
             style="background: var(--primary); padding: 1rem 1.2rem; color: white; display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -204,7 +267,7 @@
         <div id="chat-messages"
             style="flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
             <div class="bot-msg"
-                style="background: #f0ebff; padding: 0.8rem 1rem; border-radius: 12px 12px 12px 0; font-size: 0.88rem; color: var(--text-main); max-width: 85%;">
+                style="background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border: 1px solid var(--border); border-radius: 12px 12px 12px 0; font-size: 0.88rem; color: var(--text-main); max-width: 85%;">
                 Hi! I'm FinanceBot 👋 Ask me anything about budgeting, saving, investing or earning money!
             </div>
         </div>
@@ -234,8 +297,9 @@
             div.style.cssText = `
                 padding: 0.8rem 1rem; border-radius: ${isUser ? '12px 12px 0 12px' : '12px 12px 12px 0'};
                 font-size: 0.88rem; max-width: 85%; word-wrap: break-word;
-                background: ${isUser ? 'var(--primary)' : '#f0ebff'};
-                color: ${isUser ? 'white' : 'var(--text-main)'};
+                background: ${isUser ? 'var(--primary)' : 'rgba(255,255,255,0.05)'};
+                border: 1px solid ${isUser ? 'var(--primary-glow)' : 'var(--border)'};
+                color: white;
                 align-self: ${isUser ? 'flex-end' : 'flex-start'};
             `;
             div.textContent = text;

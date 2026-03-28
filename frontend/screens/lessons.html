@@ -12,12 +12,17 @@
 </head>
 
 <body>
-    <div class="nav-bar">
-        <div class="logo">TeenFinance</div>
-        <a href="dashboard.html" class="btn btn-secondary" style="text-decoration: none;">Back to Dashboard</a>
-    </div>
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/dashboard'">
+            <i class="fas fa-rocket"></i>
+            Teen<span>Finance</span>
+        </div>
+        <a href="/dashboard" class="btn btn-secondary btn-sm" style="text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </nav>
 
-    <main style="padding: 2rem; display: flex; justify-content: center;">
+    <main class="layout-container" style="display: flex; justify-content: center;">
         <div class="glass-card animate-fade-in" style="width: 100%; max-width: 800px;">
             <div id="lesson-header" style="border-radius: 15px; overflow: hidden; margin-bottom: 2rem;">
                 <img id="lesson-cover" src="" style="width: 100%; height: 250px; object-fit: cover; display: block;">
@@ -47,6 +52,8 @@
         </div>
     </main>
 
+    </main>
+
     <script src="../js/api.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -55,7 +62,7 @@
 
         async function loadLesson() {
             if (!lessonId) {
-                window.location.href = 'dashboard.html';
+                window.location.href = '/dashboard';
                 return;
             }
 
@@ -78,17 +85,8 @@
                 currentLesson.topics.forEach((topic, index) => {
 
                     const btn = document.createElement("button");
-                    btn.style.cssText = `
-    width: 100%; text-align: left; padding: 1rem 1.2rem;
-    background: #f7fafc; border: 1px solid var(--border);
-    border-radius: 10px; font-size: 1rem; font-weight: 600;
-    color: var(--text-main); cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center;
-    transition: all 0.2s ease;
-`;
+                    btn.className = "accordion-btn";
                     btn.innerHTML = `<span>${topic.title}</span><span style="font-size:1.2rem; color:var(--primary);">+</span>`;
-                    btn.onmouseover = () => btn.style.background = '#edf2f7';
-                    btn.onmouseout = () => btn.style.background = '#f7fafc';
 
                     btn.onclick = () => {
                         topicContent.style.display = "block";
@@ -156,12 +154,18 @@
 
                 card.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 0.8rem; margin-bottom: 1rem;">
-                        <span style="background: #fff3cd; color: #856404; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">📋 ${c.type}</span>
+                        <span class="badge badge-primary">📋 ${c.type}</span>
                         <span style="font-size: 0.8rem; color: var(--text-muted);">Case #${index + 1}</span>
                     </div>
                     <div style="background: #1a1a2e; color: #e0e0e0; border-radius: 10px; padding: 1.2rem; margin-bottom: 1.2rem; font-family: monospace; font-size: 0.9rem; line-height: 1.6;">
                         ${c.scenario}
                     </div>
+                    ${c.warning ? `
+                        <div style="margin-top: 1rem; padding: 1rem; border-radius: 12px;
+                            border: 1px solid rgba(248, 113, 113, 0.3); background: rgba(248, 113, 113, 0.05); color: #fecaca;">
+                            <strong>⚠️ Warning:</strong> ${c.warning}
+                        </div>
+                    ` : ''}
                     <p style="font-size: 0.9rem; font-weight: 600; margin-bottom: 0.8rem; color: var(--text-main);">Is this a scam?</p>
                     <div style="display: flex; gap: 1rem;" id="answer-btns">
                         <button id="scam-btn" onclick="checkAnswer(true)" style="
@@ -270,7 +274,7 @@
                     <p style="margin-bottom: 0.8rem; font-weight: 600;">${q.q}</p>
                     <div style="display: flex; flex-direction: column; gap: 0.5rem;">
                         ${q.a.map((opt, oIndex) => `
-                            <label class="glass-card" style="padding: 0.8rem; display: flex; align-items: center; gap: 0.8rem; cursor: pointer;">
+                            <label class="quiz-option">
                                 <input type="radio" name="q${qIndex}" value="${oIndex}">
                                 <span>${opt}</span>
                             </label>
@@ -304,7 +308,7 @@
                 alert(`Excellent! You scored ${score}%. Lesson completed.`);
                 try {
                     await API.dashboard.updateProgress({ module_name: lessonId, status: 'completed', score: score });
-                    window.location.href = 'dashboard.html';
+                    window.location.href = '/dashboard';
                 } catch (err) {
                     alert('Failed to save progress');
                 }

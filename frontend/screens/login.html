@@ -12,15 +12,24 @@
 </head>
 
 <body>
-    <div class="nav-bar">
-        <div class="logo">TeenFinance</div>
-    </div>
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/'">
+            <i class="fas fa-rocket"></i>
+            Teen<span>Finance</span>
+        </div>
+        <button class="mobile-nav-toggle" id="nav-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="nav-menu">
+            <a href="/" class="nav-item">Home</a>
+            <a href="/register" class="nav-item">Sign Up</a>
+        </div>
+    </nav>
 
-    <main style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 2rem;">
+    <main class="layout-container" style="display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 72px);">
         <div class="glass-card animate-fade-in" style="width: 100%; max-width: 450px;">
-            <h1 id="form-title" style="margin-bottom: 0.5rem;">Join the Journey</h1>
-            <p id="form-subtitle" style="color: var(--text-muted); margin-bottom: 2rem;">Master your finances from day
-                one.</p>
+            <h1 id="form-title" style="margin-bottom: 0.5rem;" class="text-gradient">Join the Journey</h1>
+            <p id="form-subtitle" style="color: var(--text-muted); margin-bottom: 2rem;">Master your finances from day one.</p>
 
             <form id="auth-form">
                 <div class="input-group">
@@ -100,7 +109,7 @@
                 if (isLogin) {
                     const res = await API.auth.login({ username, password });
                     localStorage.setItem('user', JSON.stringify(res.user));
-                    window.location.href = '/screens/home.html';;
+                    window.location.href = '/home';
                 } else {
                     const age = document.getElementById('age').value;
                     const skills = document.getElementById('skills').value;
@@ -113,6 +122,17 @@
                 authError.style.display = 'block';
             }
         });
+
+        // Mobile Nav Toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                navToggle.querySelector('i').classList.toggle('fa-bars');
+                navToggle.querySelector('i').classList.toggle('fa-times');
+            });
+        }
     </script>
 </body>
 

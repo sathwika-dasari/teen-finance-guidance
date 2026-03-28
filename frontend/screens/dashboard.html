@@ -4,29 +4,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Teen Finance Guidance</title>
+    <title>Dashboard — Teen Finance Guidance</title>
+    <meta name="description" content="Track your financial learning progress and mastery modules.">
     <link rel="stylesheet" href="../css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* ── Page-specific overrides ── */
+        body {
+            min-height: 100vh;
+        }
+
+        /* Header Banner */
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(124,58,237,0.2) 0%, rgba(6,182,212,0.1) 100%);
+            border-bottom: 1px solid var(--border);
+            padding: 2rem 2.5rem 1.5rem;
+        }
+
+        .dashboard-header h1 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+        }
+
+        .dashboard-header p {
+            color: var(--text-muted);
+            margin-top: 0.35rem;
+            font-size: 0.9rem;
+        }
+
+        .dashboard-header .header-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Progress Hero Card */
+        .progress-hero {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            flex-shrink: 0;
+        }
+
+        .chart-center-label {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .chart-center-label .pct {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .chart-center-label .pct-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-top: 4px;
+        }
+
+        .progress-info {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .progress-info h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+        }
+
+        .progress-info .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1.25rem;
+        }
+
+        .stat-row {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2rem;
+        }
+
+        .stat-item .value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1;
+        }
+
+        .stat-item .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .legend-row {
+            display: flex;
+            gap: 1.25rem;
+            margin-top: 1.25rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* Learning Path Card */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .lesson-item {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson-item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: linear-gradient(180deg, var(--primary), var(--accent));
+            border-radius: 0 3px 3px 0;
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .lesson-item:hover {
+            background: var(--surface-3);
+            border-color: var(--border-2);
+            transform: translateX(4px);
+        }
+
+        .lesson-item:hover::before {
+            opacity: 1;
+        }
+
+        .lesson-item.completed {
+            border-color: rgba(52, 211, 153, 0.2);
+            background: rgba(52, 211, 153, 0.04);
+        }
+
+        .lesson-item.completed::before {
+            background: var(--success);
+            opacity: 1;
+        }
+
+        .lesson-thumb {
+            width: 90px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            background: var(--surface-3);
+        }
+
+        .lesson-body {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .lesson-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .lesson-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .lesson-action {
+            flex-shrink: 0;
+        }
+
+        .check-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(52, 211, 153, 0.15);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--success);
+            font-size: 0.85rem;
+        }
+
+        /* Skeleton loading */
+        @keyframes skeleton-wave {
+            0%   { background-position: -400px 0; }
+            100% { background-position: 400px 0; }
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+            background-size: 800px 100%;
+            animation: skeleton-wave 1.5s infinite linear;
+            border-radius: 8px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 768px) {
+            .dashboard-header { padding: 1.5rem 1.25rem 1rem; }
+            .dashboard-header h1 { font-size: 1.4rem; }
+            .progress-hero { gap: 1.5rem; }
+            .chart-wrapper { width: 140px; height: 140px; }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="nav-bar">
-        <div class="logo" style="cursor: pointer; font-weight: 800; color: var(--primary);"
-            onclick="window.location.href='home.html'">Teen<span style="color: #c9973a;">Finance</span></div>
-        <div class="nav-links">
-            <a href="home.html" class="nav-item">
+
+    <!-- ── NAVBAR ── -->
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/home'">
+            <i class="fas fa-rocket"></i>
+            Teen<span>Finance</span>
+        </div>
+        <button class="mobile-nav-toggle" id="nav-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="nav-menu">
+            <a href="/home" class="nav-item">
                 <i class="fas fa-home nav-icon"></i>
                 <span>Home</span>
             </a>
-            <a href="dashboard.html" class="nav-item active">
+            <a href="/dashboard" class="nav-item active">
                 <i class="fas fa-chart-line nav-icon"></i>
                 <span>Dashboard</span>
             </a>
-            <a href="profile.html" class="nav-item">
+            <a href="/profile" class="nav-item">
                 <i class="fas fa-user nav-icon"></i>
                 <span>Profile</span>
             </a>
@@ -35,144 +330,640 @@
                 <span>Logout</span>
             </button>
         </div>
+    </nav>
+
+    <main class="layout-container">
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+
+    <!-- ── PAGE HEADER ── -->
+    <div class="dashboard-header">
+        <h1 class="text-gradient">Your Dashboard</h1>
+        <p>Track your learning progress and continue your financial journey.</p>
+        <div class="header-meta">
+            <span class="badge badge-primary"><i class="fas fa-bolt"></i> Learning in progress</span>
+            <span id="user-greeting" style="font-size:0.85rem; color: var(--text-muted);"></span>
+        </div>
     </div>
 
+    <!-- ── DASHBOARD GRID ── -->
     <main class="dashboard-grid">
-        <section class="glass-card animate-fade-in"
-            style="grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 3rem; flex-wrap: wrap;">
-            <div style="position: relative; width: 200px; height: 200px;">
-                <canvas id="completionChart"></canvas>
-                <div
-                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 800; color: var(--primary);" id="progress-percent">0%
+
+        <!-- Progress Overview -->
+        <section class="glass-card animate-fade-in" style="grid-column: 1 / -1;">
+            <div class="progress-hero">
+                <div class="chart-wrapper">
+                    <canvas id="completionChart"></canvas>
+                    <div class="chart-center-label">
+                        <div class="pct" id="progress-percent">0%</div>
+                        <div class="pct-label">Complete</div>
                     </div>
-                    <div style="font-size: 0.75rem; color: var(--text-muted);">Complete</div>
                 </div>
-            </div>
-            <div>
-                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 0.5rem;">Module Progress</h3>
-                <div style="margin-bottom: 0.5rem; font-weight: 600; color: var(--text-muted);">Overall Mastery</div>
-                <p id="completed-modules" style="font-size: 0.95rem; color: var(--text-muted); margin-top: 0.5rem;"></p>
-                <div style="display: flex; gap: 1.5rem; margin-top: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--primary);"></div>
-                        <span style="font-size: 0.85rem; color: var(--text-muted);">Completed</span>
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <div
-                            style="width: 12px; height: 12px; border-radius: 50%; background: #edf2f7; border: 1px solid var(--border);">
+                <div class="progress-info">
+                    <h3>Module Mastery</h3>
+                    <p class="subtitle" id="completed-modules">No modules finished yet — start one below!</p>
+
+                    <div class="stat-row" id="stat-row">
+                        <div class="stat-item">
+                            <span class="value" id="stat-done">0</span>
+                            <span class="label">Completed</span>
                         </div>
-                        <span style="font-size: 0.85rem; color: var(--text-muted);">Remaining</span>
+                        <div class="stat-item">
+                            <span class="value" id="stat-remaining">—</span>
+                            <span class="label">Remaining</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="value" id="stat-total">—</span>
+                            <span class="label">Total</span>
+                        </div>
+                    </div>
+
+                    <div class="legend-row">
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: linear-gradient(135deg,#7c3aed,#06b6d4);"></div>
+                            Completed
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot" style="background: rgba(255,255,255,0.08); border:1px solid var(--border);"></div>
+                            Remaining
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
-        <section class="glass-card animate-fade-in" id="experience-section">
-            <h2 id="module-title">Your Learning Path</h2>
-            <p id="module-desc" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
-            <div id="lessons-list" style="display: flex; flex-direction: column; gap: 1rem;">
-                <!-- Lessons will be injected here -->
             </div>
         </section>
 
+        <!-- Learning Path -->
+        <section class="glass-card animate-fade-in" id="experience-section" style="grid-column: 1 / -1; animation-delay: 0.1s;">
+            <div class="section-header">
+                <div>
+                    <h2 id="module-title">Your Learning Path</h2>
+                    <p id="module-desc" style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;"></p>
+                </div>
+                <span class="badge badge-primary" id="lesson-count-badge"></span>
+            </div>
+
+            <div id="lessons-list" class="module-cover-grid" style="margin-top: 1rem;">
+                <!-- Injected by JS -->
+                <div class="skeleton" style="height:140px;"></div>
+                <div class="skeleton" style="height:140px; opacity:0.6;"></div>
+                <div class="skeleton" style="height:140px; opacity:0.35;"></div>
+            </div>
+        </section>
+
+        <!-- Job Navigator Form (Above 18) -->
+        <section class="glass-card animate-fade-in" id="job-navigator-section" style="grid-column: 1 / -1; display: none; animation-delay: 0.15s;">
+            <div style="background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; padding: 2rem; border-radius: 16px; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">💼 Job Navigator</h2>
+                <p style="opacity: 0.9;">Tell us about yourself and we'll find the best opportunities for you!</p>
+            </div>
+
+            <div id="form-section">
+                <h3 style="margin-bottom: 1.5rem; font-weight: 700;">Tell us about yourself</h3>
+
+                <div class="input-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem;">How many hours per day can you work?</label>
+                    <select id="dashboard-hours" style="width: 100%;">
+                        <option value="">Select hours</option>
+                        <option value="1-2">1-2 hours</option>
+                        <option value="3-4">3-4 hours</option>
+                        <option value="5-6">5-6 hours</option>
+                        <option value="7+">7+ hours</option>
+                    </select>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 1.25rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem;">What are your main skills?</label>
+                    <select id="dashboard-skills" style="width: 100%;">
+                        <option value="">Select a skill</option>
+                        <option value="coding">Coding / Programming</option>
+                        <option value="design">Design / Art</option>
+                        <option value="writing">Writing / Editing</option>
+                        <option value="teaching">Teaching / Tutoring</option>
+                        <option value="marketing">Marketing / Social Media</option>
+                        <option value="general">No specific skill yet</option>
+                    </select>
+                </div>
+
+                <div class="input-group" style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600; font-size: 0.9rem;">What are you most interested in?</label>
+                    <select id="dashboard-interests" style="width: 100%;">
+                        <option value="">Select an interest</option>
+                        <option value="tech">Technology</option>
+                        <option value="creative">Creative work</option>
+                        <option value="education">Education</option>
+                        <option value="business">Business</option>
+                        <option value="flexible">Anything flexible</option>
+                    </select>
+                </div>
+
+                <div id="dashboard-form-error"
+                    style="color: var(--error); font-size: 0.9rem; margin-bottom: 1rem; display: none;">Please fill in all fields!</div>
+                <button class="btn btn-primary" style="width: 100%;" onclick="getJobRecommendations()">Find Opportunities →</button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="dashboard-results-section" style="display: none; margin-top: 2rem;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">🎯 Recommended for You</h3>
+                <div id="dashboard-options-container" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+            </div>
+
+            <!-- Roadmap Section -->
+            <div id="dashboard-roadmap-section" style="display: none; margin-top: 2rem;">
+                <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem;">🗺️ Your Roadmap</h3>
+                <div id="dashboard-roadmap-container" style="display: flex; flex-direction: column; gap: 1rem;"></div>
+                <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="resetJobForm()">← Try Another Option</button>
+            </div>
+        </section>
+
+        <!-- Career Path Guidance (Above 18) -->
+        <section class="glass-card animate-fade-in" id="guidance-section" style="grid-column: 1 / -1; display: none; animation-delay: 0.2s;">
+            <div class="section-header">
+                <div>
+                    <h2>Recommended Career Paths</h2>
+                    <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">Personalized guidance based on your skills.</p>
+                </div>
+            </div>
+            <div id="guidance-grid" class="module-cover-grid" style="margin-top: 1.5rem;">
+                <!-- Career path cards injected by JS -->
+            </div>
+        </section>
 
     </main>
 
+    </main>
+
+    <!-- ── SCRIPTS ── -->
     <script src="../js/api.js"></script>
     <script>
+        // Mobile Nav Toggle
+        const navToggle = document.getElementById('nav-toggle');
+        const navMenu = document.getElementById('nav-menu');
+        if (navToggle && navMenu) {
+            navToggle.addEventListener('click', () => {
+                navMenu.classList.toggle('active');
+                navToggle.querySelector('i').classList.toggle('fa-bars');
+                navToggle.querySelector('i').classList.toggle('fa-times');
+            });
+        }
+
         const userData = JSON.parse(localStorage.getItem('user'));
         if (!userData) window.location.href = 'login.html';
 
-        async function loadDashboard() {
-            try {
-                const guidance = await API.recommendation.getGuidance();
-                const progress = await API.dashboard.getProgress();
+        // Greet user
+        if (userData?.username) {
+            document.getElementById('user-greeting').textContent = `Welcome back, ${userData.username} 👋`;
+        }
 
-                document.getElementById('module-title').textContent = guidance.title;
+        // ── Job Navigator Data ──
+        const opportunities = {
+            coding: [
+                { title: "Freelance Web Developer", icon: "💻", desc: "Build websites for local businesses and startups.", earn: "₹500-2000/project" },
+                { title: "App Developer", icon: "📱", desc: "Create mobile apps and sell or freelance.", earn: "₹1000-5000/project" },
+                { title: "Tech Tutor", icon: "👨‍🏫", desc: "Teach coding to beginners online.", earn: "₹200-500/hour" }
+            ],
+            design: [
+                { title: "Graphic Designer", icon: "🎨", desc: "Design logos, posters and social media content.", earn: "₹300-1500/project" },
+                { title: "UI/UX Designer", icon: "✏️", desc: "Design app interfaces for startups.", earn: "₹500-3000/project" },
+                { title: "Video Editor", icon: "🎬", desc: "Edit videos for YouTubers and businesses.", earn: "₹300-1000/video" }
+            ],
+            writing: [
+                { title: "Content Writer", icon: "✍️", desc: "Write blogs and articles for websites.", earn: "₹200-800/article" },
+                { title: "Copywriter", icon: "📝", desc: "Write marketing copy for businesses.", earn: "₹500-2000/project" },
+                { title: "Proofreader", icon: "🔍", desc: "Proofread documents and academic papers.", earn: "₹150-500/hour" }
+            ],
+            teaching: [
+                { title: "Online Tutor", icon: "📚", desc: "Tutor students in subjects you excel at.", earn: "₹200-500/hour" },
+                { title: "Course Creator", icon: "🎓", desc: "Create and sell online courses.", earn: "₹2000-20000/course" },
+                { title: "Skill Trainer", icon: "🏋️", desc: "Train others in your area of expertise.", earn: "₹300-800/session" }
+            ],
+            marketing: [
+                { title: "Social Media Manager", icon: "📱", desc: "Manage social accounts for small businesses.", earn: "₹3000-8000/month" },
+                { title: "Influencer / Content Creator", icon: "🌟", desc: "Build your personal brand and monetize.", earn: "Varies" },
+                { title: "Digital Marketer", icon: "📊", desc: "Run ads and campaigns for businesses.", earn: "₹500-2000/project" }
+            ],
+            general: [
+                { title: "Virtual Assistant", icon: "💼", desc: "Help businesses with admin and organizational tasks.", earn: "₹200-400/hour" },
+                { title: "Data Entry Specialist", icon: "⌨️", desc: "Handle data entry tasks for companies.", earn: "₹150-300/hour" },
+                { title: "Customer Support", icon: "🎧", desc: "Work remotely as customer support agent.", earn: "₹8000-15000/month" }
+            ]
+        };
 
-                const lessonsList = document.getElementById('lessons-list');
-                lessonsList.innerHTML = guidance.lessons.map(lesson => {
-                    const isDone = progress.find(p => p.module_name === lesson.id && p.status === 'completed');
-                    return `
-                        <div class="glass-card" style="padding: 1rem; border-color: ${isDone ? 'var(--accent)' : 'var(--glass-border)'}; display: flex; gap: 1rem; align-items: center;">
-                            <img src="${lesson.image}" style="width: 100px; height: 60px; border-radius: 8px; object-fit: cover;">
-                            <div style="flex: 1;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                                    <div>
-                                        <h4 style="margin-bottom: 0.2rem;">${lesson.title}</h4>
-                                        <p style="font-size: 0.85rem; color: var(--text-secondary);">${lesson.desc}</p>
+        const roadmaps = {
+            "Freelance Web Developer": [
+                { step: 1, title: "Learn the Basics", desc: "Start with HTML, CSS and JavaScript. Use free resources like freeCodeCamp or YouTube.", icon: "📖" },
+                { step: 2, title: "Build 3 Projects", desc: "Create a portfolio website, a landing page and a simple web app to showcase your skills.", icon: "🛠️" },
+                { step: 3, title: "Create Your Portfolio", desc: "Put your projects on GitHub and build a personal portfolio website.", icon: "🌐" },
+                { step: 4, title: "Find Your First Client", desc: "Join Fiverr, Upwork or reach out to local businesses. Offer discounted rates initially.", icon: "🤝" },
+                { step: 5, title: "Deliver & Get Reviews", desc: "Complete projects professionally, ask for reviews and build your reputation.", icon: "⭐" }
+            ],
+            "Graphic Designer": [
+                { step: 1, title: "Learn Design Tools", desc: "Start with Canva (free) then move to Adobe Illustrator or Figma.", icon: "🎨" },
+                { step: 2, title: "Study Design Principles", desc: "Learn about color theory, typography and layout through YouTube or Coursera.", icon: "📖" },
+                { step: 3, title: "Build a Portfolio", desc: "Create 5-10 sample designs: logos, posters, social media posts.", icon: "🖼️" },
+                { step: 4, title: "Join Freelance Platforms", desc: "Sign up on Fiverr, 99designs or reach out to local businesses.", icon: "💼" },
+                { step: 5, title: "Grow Your Client Base", desc: "Ask for referrals, post your work on Instagram and Behance.", icon: "📈" }
+            ],
+            "Content Writer": [
+                { step: 1, title: "Pick Your Niche", desc: "Choose topics you know well — tech, finance, health, lifestyle etc.", icon: "✍️" },
+                { step: 2, title: "Practice Writing Daily", desc: "Write 300-500 words every day to improve your style and speed.", icon: "📝" },
+                { step: 3, title: "Build a Writing Portfolio", desc: "Create 3-5 sample articles on your chosen niche.", icon: "📂" },
+                { step: 4, title: "Find Writing Gigs", desc: "Join ProBlogger, Fiverr, LinkedIn or approach blogs directly.", icon: "🔍" },
+                { step: 5, title: "Scale Up", desc: "Increase your rates as you build experience and testimonials.", icon: "🚀" }
+            ],
+            "Online Tutor": [
+                { step: 1, title: "Pick Your Subject", desc: "Choose a subject you are confident in — math, science, English etc.", icon: "📚" },
+                { step: 2, title: "Set Up Your Space", desc: "Get a quiet space, good lighting and a working mic/camera.", icon: "🎙️" },
+                { step: 3, title: "Join Tutoring Platforms", desc: "Sign up on Chegg, Tutor.com, Vedantu or Superprof.", icon: "💻" },
+                { step: 4, title: "Promote Yourself", desc: "Spread the word in school/college groups and local community.", icon: "📣" },
+                { step: 5, title: "Build Regular Students", desc: "Focus on results, ask for referrals and build a loyal student base.", icon: "⭐" }
+            ],
+            "Social Media Manager": [
+                { step: 1, title: "Learn Social Media Strategy", desc: "Study how Instagram, LinkedIn and Facebook algorithms work.", icon: "📱" },
+                { step: 2, title: "Practice on Your Own Accounts", desc: "Build your own social presence as proof of your skills.", icon: "🌟" },
+                { step: 3, title: "Learn Basic Design & Copywriting", desc: "Use Canva for visuals and learn to write engaging captions.", icon: "✏️" },
+                { step: 4, title: "Find Your First Client", desc: "Offer free management for 1 month to a local business to get experience.", icon: "🤝" },
+                { step: 5, title: "Scale to Multiple Clients", desc: "Use your results as case studies to attract paying clients.", icon: "📈" }
+            ],
+            "Virtual Assistant": [
+                { step: 1, title: "Learn Essential Tools", desc: "Get comfortable with Google Workspace, Trello, Slack and Zoom.", icon: "🛠️" },
+                { step: 2, title: "List Your Services", desc: "Decide what you offer: email management, scheduling, data entry etc.", icon: "📋" },
+                { step: 3, title: "Create a Profile", desc: "Sign up on Fiverr, Upwork or Freelancer with a clear description.", icon: "👤" },
+                { step: 4, title: "Apply for Jobs", desc: "Apply to VA job postings on LinkedIn and VA Facebook groups.", icon: "📨" },
+                { step: 5, title: "Deliver & Get Testimonials", desc: "Be reliable, meet deadlines and ask happy clients for reviews.", icon: "⭐" }
+            ]
+        };
+
+        const platforms = {
+            "Learn the Basics": [
+                { name: "freeCodeCamp", url: "https://www.freecodecamp.org", icon: "🆓", desc: "Free coding courses" },
+                { name: "The Odin Project", url: "https://www.theodinproject.com", icon: "🔗", desc: "Free full-stack curriculum" },
+                { name: "YouTube - Traversy Media", url: "https://www.youtube.com/@TraversyMedia", icon: "▶️", desc: "Free video tutorials" }
+            ],
+            "Build 3 Projects": [
+                { name: "GitHub", url: "https://github.com", icon: "💻", desc: "Host your projects here" },
+                { name: "CodePen", url: "https://codepen.io", icon: "✏️", desc: "Build & share front-end projects" }
+            ],
+            "Create Your Portfolio": [
+                { name: "GitHub Pages", url: "https://pages.github.com", icon: "🌐", desc: "Free portfolio hosting" },
+                { name: "Netlify", url: "https://netlify.com", icon: "🚀", desc: "Deploy your site for free" }
+            ],
+            "Find Your First Client": [
+                { name: "Fiverr", url: "https://www.fiverr.com", icon: "💼", desc: "Freelance marketplace" },
+                { name: "Upwork", url: "https://www.upwork.com", icon: "🤝", desc: "Professional freelancing" }
+            ],
+            "Learn Design Tools": [
+                { name: "Canva", url: "https://www.canva.com", icon: "🎨", desc: "Free design tool for beginners" },
+                { name: "Figma", url: "https://www.figma.com", icon: "✏️", desc: "Free UI/UX design tool" },
+                { name: "Adobe Express", url: "https://www.adobe.com/express", icon: "🖌️", desc: "Quick graphic design" }
+            ],
+            "Study Design Principles": [
+                { name: "Coursera - Design", url: "https://www.coursera.org/search?query=graphic+design", icon: "📖", desc: "Free design courses" },
+                { name: "YouTube - Design Theory", url: "https://www.youtube.com/results?search_query=design+principles", icon: "▶️", desc: "Free video tutorials" }
+            ],
+            "Build a Portfolio": [
+                { name: "Behance", url: "https://www.behance.net", icon: "🖼️", desc: "Showcase your design work" },
+                { name: "Dribbble", url: "https://dribbble.com", icon: "🎯", desc: "Design community & portfolio" }
+            ],
+            "Join Freelance Platforms": [
+                { name: "Fiverr", url: "https://www.fiverr.com", icon: "💼", desc: "Sell your services" },
+                { name: "99designs", url: "https://99designs.com", icon: "🎨", desc: "Design-specific platform" }
+            ],
+            "Pick Your Niche": [
+                { name: "Google Trends", url: "https://trends.google.com", icon: "📊", desc: "Find trending topics" },
+                { name: "Medium", url: "https://medium.com", icon: "✍️", desc: "Read & publish articles" }
+            ],
+            "Practice Writing Daily": [
+                { name: "Hemingway Editor", url: "https://hemingwayapp.com", icon: "📝", desc: "Improve your writing clarity" },
+                { name: "Grammarly", url: "https://www.grammarly.com", icon: "✅", desc: "Free grammar checker" }
+            ],
+            "Find Writing Gigs": [
+                { name: "ProBlogger", url: "https://problogger.com/jobs", icon: "🔍", desc: "Writing job board" },
+                { name: "Fiverr", url: "https://www.fiverr.com", icon: "💼", desc: "Freelance writing gigs" },
+                { name: "LinkedIn", url: "https://www.linkedin.com", icon: "🤝", desc: "Professional network" }
+            ],
+            "Join Tutoring Platforms": [
+                { name: "Vedantu", url: "https://www.vedantu.com", icon: "📚", desc: "Online tutoring platform" },
+                { name: "Chegg", url: "https://www.chegg.com/tutors", icon: "🎓", desc: "Tutor students online" },
+                { name: "Superprof", url: "https://www.superprof.co.in", icon: "👨‍🏫", desc: "Find tutoring students" }
+            ],
+            "Learn Social Media Strategy": [
+                { name: "HubSpot Academy", url: "https://academy.hubspot.com", icon: "📱", desc: "Free social media courses" },
+                { name: "Meta Blueprint", url: "https://www.facebook.com/business/learn", icon: "📘", desc: "Free Facebook & Instagram courses" }
+            ],
+            "Learn Essential Tools": [
+                { name: "Google Workspace", url: "https://workspace.google.com", icon: "🛠️", desc: "Docs, Sheets, Gmail" },
+                { name: "Trello", url: "https://trello.com", icon: "📋", desc: "Free project management" },
+                { name: "Notion", url: "https://www.notion.so", icon: "📓", desc: "Free productivity tool" }
+            ],
+            "Apply for Jobs": [
+                { name: "LinkedIn", url: "https://www.linkedin.com", icon: "🤝", desc: "Professional job network" },
+                { name: "Upwork", url: "https://www.upwork.com", icon: "💼", desc: "Remote job marketplace" },
+                { name: "Fiverr", url: "https://www.fiverr.com", icon: "🌟", desc: "Freelance marketplace" }
+            ]
+        };
+
+        function getJobRecommendations() {
+            const hours = document.getElementById('dashboard-hours').value;
+            const skills = document.getElementById('dashboard-skills').value;
+            const interests = document.getElementById('dashboard-interests').value;
+            const errorEl = document.getElementById('dashboard-form-error');
+
+            if (!hours || !skills || !interests) {
+                errorEl.style.display = 'block';
+                return;
+            }
+            errorEl.style.display = 'none';
+
+            const options = opportunities[skills] || opportunities['general'];
+
+            const resultsSection = document.getElementById('dashboard-results-section');
+            const optionsContainer = document.getElementById('dashboard-options-container');
+            resultsSection.style.display = 'block';
+
+            optionsContainer.innerHTML = options.map((opt, i) => `
+                <div class="glass-card" style="display: flex; align-items: center; gap: 1.5rem; padding: 1.5rem; cursor: pointer; border: 2px solid var(--border); transition: all 0.2s ease;"
+                    onmouseover="this.style.borderColor='var(--primary)'"
+                    onmouseout="this.style.borderColor='var(--border)'"
+                    onclick="showJobRoadmap('${opt.title}')">
+                    <div style="font-size: 2.5rem; flex-shrink: 0;">${opt.icon}</div>
+                    <div style="flex: 1;">
+                        <h4 style="font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem;">${opt.title}</h4>
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem;">${opt.desc}</p>
+                        <span style="font-size: 0.8rem; background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.2)); color: var(--primary-light); padding: 0.2rem 0.8rem; border-radius: 20px; font-weight: 600;">💰 ${opt.earn}</span>
+                    </div>
+                    <i class="fas fa-chevron-right" style="color: var(--text-muted);"></i>
+                </div>
+            `).join('');
+
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showJobRoadmap(title) {
+            const steps = roadmaps[title] || roadmaps["Virtual Assistant"];
+            const roadmapSection = document.getElementById('dashboard-roadmap-section');
+            const roadmapContainer = document.getElementById('dashboard-roadmap-container');
+
+            roadmapSection.style.display = 'block';
+            roadmapContainer.innerHTML = `
+                <div class="glass-card" style="background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; padding: 1.5rem; margin-bottom: 0.5rem; border-radius: 16px;">
+                    <h3 style="font-size: 1.2rem; font-weight: 800;">Your Path to: ${title}</h3>
+                    <p style="opacity: 0.9; font-size: 0.9rem; margin-top: 0.3rem;">Follow these steps to get started!</p>
+                </div>
+                ${steps.map(step => {
+                const stepPlatforms = platforms[step.title] || [];
+                const platformsHTML = stepPlatforms.length > 0 ? `
+                        <div id="dashboard-platforms-${step.step}" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);">
+                            <p style="font-size: 0.8rem; font-weight: 700; color: var(--primary); margin-bottom: 0.8rem;">📌 Where to learn / get started:</p>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                ${stepPlatforms.map(p => `
+                                    <a href="${p.url}" target="_blank" style="
+                                        display: flex; align-items: center; gap: 0.8rem;
+                                        padding: 0.7rem 1rem; border-radius: 8px;
+                                        background: var(--surface-2); border: 1px solid var(--border);
+                                        text-decoration: none; color: var(--text-main);
+                                        transition: all 0.2s ease;"
+                                        onmouseover="this.style.background='var(--primary-dark)'; this.style.borderColor='var(--primary)'; this.style.color='white'"
+                                        onmouseout="this.style.background='var(--surface-2)'; this.style.borderColor='var(--border)'; this.style.color='var(--text-main)'">
+                                        <span style="font-size: 1.2rem;">${p.icon}</span>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 0.88rem;">${p.name}</div>
+                                            <div style="font-size: 0.78rem; color: var(--text-muted);">${p.desc}</div>
+                                        </div>
+                                        <i class="fas fa-external-link-alt" style="margin-left: auto; color: var(--text-muted); font-size: 0.75rem;"></i>
+                                    </a>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : '';
+
+                return `
+                        <div class="glass-card animate-fade-in" style="padding: 1.2rem; cursor: ${stepPlatforms.length > 0 ? 'pointer' : 'default'}; border: 1px solid var(--border); transition: all 0.2s ease;"
+                            onclick="${stepPlatforms.length > 0 ? `toggleJobPlatforms(${step.step})` : ''}"
+                            onmouseover="${stepPlatforms.length > 0 ? `this.style.borderColor='var(--primary)'` : ''}"
+                            onmouseout="${stepPlatforms.length > 0 ? `this.style.borderColor='var(--border)'` : ''}">
+                            <div style="display: flex; gap: 1.2rem; align-items: flex-start;">
+                                <div style="width: 45px; height: 45px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #06b6d4); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0;">
+                                    ${step.step}
+                                </div>
+                                <div style="flex: 1;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="font-size: 1.3rem; margin-bottom: 0.3rem;">${step.icon}</div>
+                                        ${stepPlatforms.length > 0 ? `<span style="font-size: 0.75rem; color: var(--primary); font-weight: 600;">Tap to see resources ▼</span>` : ''}
                                     </div>
-                                    ${isDone ? '<span style="color: var(--accent); font-size: 1.2rem;">✓</span>' :
-                            `<button onclick="window.location.href='lessons.html?id=${lesson.id}'" class="btn btn-primary" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;">Start</button>`}
+                                    <h4 style="font-weight: 700; font-size: 0.95rem; margin-bottom: 0.3rem;">${step.title}</h4>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6;">${step.desc}</p>
+                                    ${platformsHTML}
                                 </div>
                             </div>
                         </div>
                     `;
-                }).join('');
+            }).join('')}
+            `;
 
+            roadmapSection.scrollIntoView({ behavior: 'smooth' });
+        }
 
-
-                // Update Progress UI
-                const completedCount = progress.filter(p => p.status === 'completed').length;
-                const totalModules = guidance.lessons.length;
-                const percent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
-
-                document.getElementById('progress-percent').textContent = `${percent}%`;
-
-                if (completedCount > 0) {
-                    document.getElementById('completed-modules').textContent = `${completedCount} modules finished.`;
-                } else {
-                    document.getElementById('completed-modules').textContent = "No modules finished yet.";
-                }
-
-                initCharts(percent);
-
-            } catch (err) {
-                console.error(err);
-                if (err.message === 'Unauthorized') window.location.href = '../login.html';
+        function toggleJobPlatforms(stepNum) {
+            const el = document.getElementById(`dashboard-platforms-${stepNum}`);
+            if (el) {
+                el.style.display = el.style.display === 'none' ? 'block' : 'none';
             }
         }
 
-        function initCharts(percent) {
-            // Completion Doughnut
-            const completionCtx = document.getElementById('completionChart').getContext('2d');
-            new Chart(completionCtx, {
+        function resetJobForm() {
+            document.getElementById('dashboard-roadmap-section').style.display = 'none';
+            document.getElementById('dashboard-results-section').style.display = 'none';
+            document.getElementById('dashboard-hours').value = '';
+            document.getElementById('dashboard-skills').value = '';
+            document.getElementById('dashboard-interests').value = '';
+        }
+
+        async function loadDashboard() {
+            try {
+                const [guidance, progress] = await Promise.all([
+                    API.recommendation.getGuidance(),
+                    API.dashboard.getProgress()
+                ]);
+
+                // ── Module title
+                document.getElementById('module-title').textContent = guidance.title || 'Your Learning Path';
+
+                // ── Lessons list
+                const lessonsList = document.getElementById('lessons-list');
+                const lessons = guidance.lessons || [];
+                const completedCount = progress.filter(p => p.status === 'completed').length;
+                const totalModules = lessons.length;
+                const remaining = totalModules - completedCount;
+                const percent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
+
+                lessonsList.innerHTML = lessons.length === 0
+                    ? `<div class="empty-state" style="grid-column: 1 / -1;">
+                            <i class="fas fa-book-open"></i>
+                            <p>No lessons found yet.<br>Check back soon!</p>
+                       </div>`
+                    : lessons.map((lesson, i) => {
+                        const isDone = progress.find(p => p.module_name === lesson.id && p.status === 'completed');
+                        return `
+                            <div class="module-cover-card animate-fade-in" onclick="window.location.href='/lessons?id=${lesson.id}'" style="border: ${isDone ? '2px solid var(--success)' : '1px solid var(--border)'};">
+                                <img src="${lesson.image || ''}" alt="${lesson.title}" onerror="this.src='../assets/default.png'">
+                                <div class="module-cover-overlay">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                                        <h3>${lesson.title}</h3>
+                                        ${isDone ? '<div class="check-icon" style="width: 24px; height: 24px;"><i class="fas fa-check"></i></div>' : ''}
+                                    </div>
+                                    <p style="font-size: 0.8rem; opacity: 0.9;">${lesson.desc || ''}</p>
+                                </div>
+                            </div>`;
+                    }).join('');
+
+                // ── Career Guidance (Above 18)
+                if (userData && parseInt(userData.age) >= 18) {
+                    // Show job navigator form
+                    const jobNavSection = document.getElementById('job-navigator-section');
+                    if (jobNavSection) {
+                        jobNavSection.style.display = 'block';
+                    }
+
+                    const guidanceSection = document.getElementById('guidance-section');
+                    const guidanceGrid = document.getElementById('guidance-grid');
+                    const guidanceItems = guidance.guidance || [];
+
+                    if (guidanceItems.length > 0 && guidanceSection && guidanceGrid) {
+                        guidanceSection.style.display = 'block';
+                        guidanceGrid.innerHTML = guidanceItems.map(item => `
+                            <div onclick="window.location.href='/parttime?job=${item.id}'" style="
+                                background: rgba(255,255,255,0.05);
+                                border: 1px solid rgba(255,255,255,0.1);
+                                border-radius: 16px;
+                                padding: 1.5rem;
+                                text-align: center;
+                                display: flex; flex-direction: column;
+                                cursor: pointer;
+                                transition: border-color 0.2s ease, transform 0.2s ease;
+                                min-height: 260px;"
+                                onmouseover="this.style.borderColor='var(--primary)'; this.style.transform='translateY(-3px)'"
+                                onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'; this.style.transform='translateY(0)'">
+
+                                <div style="width: 52px; height: 52px; border-radius: 50%; background: rgba(124,58,237,0.2); border: 2px solid rgba(124,58,237,0.4); margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                                    ${item.icon || '🚀'}
+                                </div>
+
+                                <h4 style="margin-bottom: 0.4rem; font-weight: 700; font-size: 1rem; color: #f1f5f9;">${item.title}</h4>
+                                <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.6rem; line-height: 1.5;">${item.desc}</p>
+                                <span style="display: inline-block; font-size: 0.7rem; font-weight: 700; color: #4ade80; background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); padding: 0.2rem 0.6rem; border-radius: 20px; margin-bottom: 1.2rem;">
+                                    💰 ${item.earn || ''}
+                                </span>
+
+                                <div style="display: flex; gap: 0.6rem; margin-top: auto;">
+                                    <a href="${item.youtube}" target="_blank"
+                                        onclick="event.stopPropagation()"
+                                        style="flex: 1; padding: 0.65rem 0.75rem; font-size: 0.8rem; font-weight: 600;
+                                               background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: 1px solid rgba(139,92,246,0.6);
+                                               color: white; border-radius: 8px; cursor: pointer;
+                                               text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+                                               transition: all 0.2s ease;"
+                                        onmouseover="this.style.background='linear-gradient(135deg, #a78bfa, #9333ea)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(139,92,246,0.4)';"
+                                        onmouseout="this.style.background='linear-gradient(135deg, #8b5cf6, #7c3aed)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                        <i class="fab fa-youtube"></i> Video
+                                    </a>
+                                    <button onclick="event.stopPropagation(); window.location.href='/lessons?id=${item.lesson_id}'"
+                                        style="flex: 1; padding: 0.65rem 0.75rem; font-size: 0.8rem; font-weight: 600;
+                                               background: linear-gradient(135deg, #06b6d4, #0891b2); border: 1px solid rgba(6,182,212,0.6);
+                                               color: white; border-radius: 8px; cursor: pointer;
+                                               display: flex; align-items: center; justify-content: center; gap: 0.4rem;
+                                               transition: all 0.2s ease;"
+                                        onmouseover="this.style.background='linear-gradient(135deg, #67e8f9, #06b6d4)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(6,182,212,0.4)';"
+                                        onmouseout="this.style.background='linear-gradient(135deg, #06b6d4, #0891b2)'; this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                                        <i class="fas fa-book-open"></i> Lesson
+                                    </button>
+                                </div>
+
+                                <div style="margin-top: 1rem; font-size: 0.75rem; color: rgba(124,58,237,0.8); font-weight: 600; letter-spacing: 0.02em;">
+                                    View Full Roadmap →
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+
+                // ── Lesson count badge
+                document.getElementById('lesson-count-badge').textContent = `${totalModules} Lessons`;
+
+                // ── Stats
+                document.getElementById('progress-percent').textContent = `${percent}%`;
+                document.getElementById('stat-done').textContent = completedCount;
+                document.getElementById('stat-remaining').textContent = remaining;
+                document.getElementById('stat-total').textContent = totalModules;
+                document.getElementById('completed-modules').textContent =
+                    completedCount > 0
+                        ? `${completedCount} of ${totalModules} module${totalModules !== 1 ? 's' : ''} completed — keep it up! 🚀`
+                        : `No modules finished yet — start one below!`;
+
+                // ── Chart
+                initChart(percent);
+
+            } catch (err) {
+                console.error(err);
+                if (err.message === 'Unauthorized') window.location.href = 'login.html';
+            }
+        }
+
+        function initChart(percent) {
+            const ctx = document.getElementById('completionChart').getContext('2d');
+            const isDark = true;
+            new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Completed', 'Remaining'],
                     datasets: [{
                         data: [percent, 100 - percent],
-                        backgroundColor: ['#6b46c1', '#edf2f7'],
+                        backgroundColor: [
+                            // gradient via CanvasGradient
+                            (() => {
+                                const g = ctx.createLinearGradient(0, 0, 180, 180);
+                                g.addColorStop(0, '#7c3aed');
+                                g.addColorStop(1, '#06b6d4');
+                                return g;
+                            })(),
+                            'rgba(255,255,255,0.07)'
+                        ],
                         borderWidth: 0,
-                        hoverOffset: 4
+                        hoverOffset: 6,
+                        borderRadius: 4,
+                        spacing: 2
                     }]
                 },
                 options: {
                     responsive: true,
-                    cutout: '80%',
+                    maintainAspectRatio: true,
+                    cutout: '78%',
                     plugins: {
-                        legend: { display: false }
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ` ${ctx.parsed}%`
+                            },
+                            backgroundColor: 'rgba(15,15,26,0.9)',
+                            titleColor: '#f1f5f9',
+                            bodyColor: '#94a3b8',
+                            borderColor: 'rgba(255,255,255,0.1)',
+                            borderWidth: 1,
+                            padding: 10
+                        }
+                    },
+                    animation: {
+                        animateRotate: true,
+                        duration: 1000,
+                        easing: 'easeInOutCubic'
                     }
                 }
             });
         }
 
-        async function startLesson(moduleId) {
-            // Simulate completing a lesson for now
-            if (confirm(`Do you want to complete the "${moduleId}" module?`)) {
-                try {
-                    await API.dashboard.updateProgress({ module_name: moduleId, status: 'completed', score: 100 });
-                    loadDashboard();
-                } catch (err) {
-                    alert('Failed to update progress');
-                }
-            }
-        }
-
         document.getElementById('logout-btn').addEventListener('click', async () => {
             await API.auth.logout();
             localStorage.removeItem('user');
-            window.location.href = 'login.html';
+            window.location.href = '/login';
         });
 
         loadDashboard();

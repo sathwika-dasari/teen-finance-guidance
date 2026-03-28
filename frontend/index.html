@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TeenFinance - Master Your Financial Future</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        .hero-section {
+            padding: 10rem 2rem 6rem;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 100px;
+            color: var(--primary-light);
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .hero-title {
+            font-size: clamp(3rem, 8vw, 5rem);
+            font-weight: 850;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: var(--gradient-hero);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtext {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            animation: fadeInUp 1.2s ease;
+        }
+
+        .trust-section {
+            padding: 4rem 2rem;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .trust-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .trust-item i {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+
+        .cta-section {
+            padding: 8rem 2rem;
+            text-align: center;
+        }
+
+        .cta-card {
+            background: var(--surface);
+            padding: 4rem 2rem;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+        }
+
+        .cta-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-glow) 0%, transparent 70%);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Nav Bar Positioning */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 15, 0.8);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-bar">
+        <div class="logo">
+            <i class="fas fa-rocket" style="color: var(--primary);"></i>
+            Teen<span style="color: var(--accent);">Finance</span>
+        </div>
+        <div class="nav-links">
+            <a href="/login" class="nav-item">Login</a>
+            <a href="/register" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.85rem;">Join Now</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- 1 HERO SECTION -->
+        <section class="hero-section">
+            <div class="hero-badge">✨ The #1 Finance App for Teens</div>
+            <h1 class="hero-title">Master Money <br>Skills Early</h1>
+            <p class="hero-subtext">Learn finance, avoid scams, and discover safe ways to earn in the digital world. Built for students, by experts.</p>
+            <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="/register" class="btn btn-primary" style="padding: 1.1rem 3.5rem; font-size: 1.1rem; border-radius: 100px;">Get Started Free <i class="fas fa-arrow-right"></i></a>
+                <a href="/login" class="btn btn-secondary" style="padding: 1.1rem 3.5rem; font-size: 1.1rem; border-radius: 100px;">Access Dashboard</a>
+            </div>
+        </section>
+
+        <!-- 2 FEATURES SECTION -->
+        <section class="reveal" style="padding: 6rem 2rem; max-width: 1300px; margin: 0 auto;">
+            <div style="text-align: center; margin-bottom: 5rem;">
+                <h2 style="font-size: 3rem; margin-bottom: 1rem; font-weight: 800;">Explore the System</h2>
+                <p style="color: var(--text-muted); font-size: 1.1rem;">Everything you need to build a solid financial foundation.</p>
+            </div>
+            <div class="features-grid">
+                <div class="glass-card">
+                    <i class="fas fa-graduation-cap" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1.5rem;"></i>
+                    <h3 style="margin-bottom: 1rem; font-weight: 700;">Finance Learning</h3>
+                    <p style="color: var(--text-muted);">Interactive modules on budgeting, saving, and investing tailored for teenagers.</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-shield-alt" style="font-size: 2.5rem; color: #f87171; margin-bottom: 1.5rem;"></i>
+                    <h3 style="margin-bottom: 1rem; font-weight: 700;">Scam Simulator</h3>
+                    <p style="color: var(--text-muted);">Real-world simulations to help you recognize and avoid online financial scams.</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-chart-line" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 1.5rem;"></i>
+                    <h3 style="margin-bottom: 1rem; font-weight: 700;">Skill Guidance</h3>
+                    <p style="color: var(--text-muted);">Discover high-income skills in demand and how to start learning them for free.</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-briefcase" style="font-size: 2.5rem; color: #fbbf24; margin-bottom: 1.5rem;"></i>
+                    <h3 style="margin-bottom: 1rem; font-weight: 700;">Job Navigator</h3>
+                    <p style="color: var(--text-muted);">Verified, age-appropriate ways to earn money safely as a student or young adult.</p>
+                </div>
+                <div class="glass-card">
+                    <i class="fas fa-robot" style="font-size: 2.5rem; color: #a855f7; margin-bottom: 1.5rem;"></i>
+                    <h3 style="margin-bottom: 1rem; font-weight: 700;">AI Assistant</h3>
+                    <p style="color: var(--text-muted);">24/7 financial advisor powered by Gemini to answer all your money questions.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3 TRUST & SAFETY SECTION -->
+        <section class="trust-section reveal" style="margin-top: 4rem;">
+            <div class="trust-grid">
+                <div class="trust-item">
+                    <i class="fas fa-check-circle"></i>
+                    <h3 style="font-weight: 700;">Verified Content</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Expert-curated modules.</p>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-user-shield"></i>
+                    <h3 style="font-weight: 700;">Built for Students</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">No credit cards required.</p>
+                </div>
+                <div class="trust-item">
+                    <i class="fas fa-lock"></i>
+                    <h3 style="font-weight: 700;">100% Free</h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">No hidden payments.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4 FINAL CTA SECTION -->
+        <section class="cta-section reveal">
+            <div class="cta-card glass-card">
+                <h2 style="font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 1.5rem; font-weight: 800; line-height: 1.2;">Start Your Financial <br>Journey Today</h2>
+                <p style="color: var(--text-muted); font-size: 1.2rem; margin-bottom: 3rem; max-width: 600px; margin-left: auto; margin-right: auto;">Join thousands of students mastering their money skills. Create your free account in 60 seconds.</p>
+                <a href="/register" class="btn btn-primary" style="padding: 1.2rem 4rem; font-size: 1.2rem; border-radius: 100px;">Create Free Account</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="padding: 4rem 10%; text-align: center; color: var(--text-muted); border-top: 1px solid var(--border);">
+        <p>&copy; 2026 TeenFinance Guidance System. Designed for the next generation.</p>
+    </footer>
+
+    <script>
+        // Scroll Reveal Animation
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Initial check
+        reveal();
+    </script>
+</body>
+</html>
