@@ -4,7 +4,7 @@ CAREER_DATA = {
         "icon": "💻",
         "desc": "Build websites for local businesses and startups.",
         "earn": "₹500-2000/project",
-        "lesson_id": "taxation_basics",
+        "lesson_id": "freelance_dev_lesson",
         "youtube": "https://www.youtube.com/results?search_query=how+to+start+freelance+web+development",
         "roadmap": [
             {"step": 1, "title": "Learn the Basics", "desc": "Start with HTML, CSS and JavaScript. Use freeCodeCamp or YouTube.", "icon": "📖"},
@@ -26,7 +26,7 @@ CAREER_DATA = {
         "icon": "🎨",
         "desc": "Design logos, posters and social media content.",
         "earn": "₹300-1500/project",
-        "lesson_id": "advanced_budgeting",
+        "lesson_id": "graphic_design_lesson",
         "youtube": "https://www.youtube.com/results?search_query=graphic+design+for+beginners",
         "roadmap": [
             {"step": 1, "title": "Learn Design Tools", "desc": "Start with Canva (free) then move to Adobe Illustrator or Figma.", "icon": "🎨"},
@@ -48,7 +48,7 @@ CAREER_DATA = {
         "icon": "✍️",
         "desc": "Write blogs and articles for websites.",
         "earn": "₹200-800/article",
-        "lesson_id": "taxation_basics",
+        "lesson_id": "content_writing_lesson",
         "youtube": "https://www.youtube.com/results?search_query=how+to+start+content+writing+freelance",
         "roadmap": [
             {"step": 1, "title": "Pick Your Niche", "desc": "Choose topics you know well — tech, finance, health, lifestyle etc.", "icon": "✍️"},
@@ -70,7 +70,7 @@ CAREER_DATA = {
         "icon": "📚",
         "desc": "Tutor students in subjects you excel at.",
         "earn": "₹200-500/hour",
-        "lesson_id": "advanced_budgeting",
+        "lesson_id": "online_tutor_lesson",
         "youtube": "https://www.youtube.com/results?search_query=how+to+become+an+online+tutor",
         "roadmap": [
             {"step": 1, "title": "Pick Your Subject", "desc": "Choose a subject you are confident in — math, science, English etc.", "icon": "📚"},
@@ -90,7 +90,7 @@ CAREER_DATA = {
         "icon": "📱",
         "desc": "Manage social accounts for small businesses.",
         "earn": "₹3000-8000/month",
-        "lesson_id": "scam_prevention",
+        "lesson_id": "social_media_manager_lesson",
         "youtube": "https://www.youtube.com/results?search_query=social+media+marketing+for+beginners",
         "roadmap": [
             {"step": 1, "title": "Learn Social Media Strategy", "desc": "Study how Instagram, LinkedIn and Facebook algorithms work.", "icon": "📱"},
@@ -110,7 +110,7 @@ CAREER_DATA = {
         "icon": "💼",
         "desc": "Help businesses with admin and organizational tasks.",
         "earn": "₹200-400/hour",
-        "lesson_id": "budgeting_101",
+        "lesson_id": "virtual_assistant_lesson",
         "youtube": "https://www.youtube.com/results?search_query=how+to+be+a+virtual+assistant+with+no+experience",
         "roadmap": [
             {"step": 1, "title": "Learn Essential Tools", "desc": "Get comfortable with Google Workspace, Trello, Slack and Zoom.", "icon": "🛠️"},

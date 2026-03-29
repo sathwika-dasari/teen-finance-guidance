@@ -379,8 +379,91 @@ Learning these skills helps individuals build long-term financial stability."""
 
 "quiz":[
 {"q":"What are taxes used for?","a":["Funding public services","Personal savings","Entertainment"],"correct":0},
-{"q":"Which tax is paid on income?","a":["Income tax","Sales tax","Property tax"],"correct":0}
 ]
+},
+
+"freelance_dev_lesson": {
+    "title": "Intro to Freelance Web Dev",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "The Tech Stack", "content": "A successful freelance web developer needs a strong foundation in HTML, CSS, and JavaScript. These languages form the building blocks of the web. As you advance, learning a frontend framework like React or Vue will allow you to build complex web applications faster."},
+        {"title": "Building a Portfolio", "content": "Your portfolio is your resume. Start by building 3-5 high-quality projects. Add a personal website, a landing page for a fictional business, and an interactive web app. Host your code on GitHub and deploy your sites using free services like Netlify or Vercel."},
+        {"title": "Landing Your First Client", "content": "Finding clients takes persistence. Start by setting up profiles on freelance marketplaces like Upwork, Fiverr, or Freelancer. Alternatively, reach out to local businesses (like restaurants or gyms) that have outdated websites. Offer them a discounted rate for your first project."}
+    ],
+    "quiz": [
+        {"q": "What is the most important asset for a freelance developer?", "a": ["A strong portfolio", "An expensive laptop", "A business suit"], "correct": 0},
+        {"q": "Where can you host your web projects for free?", "a": ["GitHub and Netlify", "Microsoft Word", "Your local hard drive"], "correct": 0}
+    ]
+},
+
+"graphic_design_lesson": {
+    "title": "Starting in Graphic Design",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "Mastering the Tools", "content": "Graphic design requires mastering tools like Adobe Illustrator, Photoshop, or free alternatives like Figma and Canva. Start by learning the basics of vector graphics, layers, and typography. Practice recreating popular logos and flyers to understand the techniques professionals use."},
+        {"title": "Design Principles", "content": "Great design is built on fundamental principles: contrast, repetition, alignment, and proximity. Understanding color theory and how to choose complementary colors is crucial. Typography also plays a massive role—knowing when to use a serif vs. sans-serif font can make or break a design."},
+        {"title": "Showcasing Your Art", "content": "Create a visual portfolio on platforms like Behance, Dribbble, or Instagram. Post your work consistently and engage with other designers. When pitching to clients, tailor your portfolio to show designs relevant to their industry (e.g., modern logos for tech startups)."}
+    ],
+    "quiz": [
+        {"q": "Which of these is a fundamental design principle?", "a": ["Alignment", "Typing speed", "File size"], "correct": 0},
+        {"q": "Which tool is commonly used by UI/UX designers?", "a": ["Figma", "Excel", "Notepad"], "correct": 0}
+    ]
+},
+
+"content_writing_lesson": {
+    "title": "Becoming a Content Writer",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "Finding Your Niche", "content": "Content writing covers everything from blog posts to technical manuals. The key to earning higher rates is finding a niche you are passionate about, such as technology, finance, health, or lifestyle. Niche writers are seen as experts and are highly valued by businesses."},
+        {"title": "The Art of Copywriting", "content": "While content writing aims to educate, copywriting aims to sell. Learning the basics of persuasive writing and SEO (Search Engine Optimization) will make your work much more valuable. Always write with clarity, keep sentences concise, and structure your posts with clear headings."},
+        {"title": "Pitching to Clients", "content": "Start by publishing your writing on platforms like Medium or your own blog to build a portfolio. Join job boards like ProBlogger or pitch directly to editors of digital publications. A good pitch is short, includes your best writing samples, and explains how your article will benefit their specific audience."}
+    ],
+    "quiz": [
+        {"q": "What does SEO stand for?", "a": ["Search Engine Optimization", "Super Effective Organization", "Standard English Output"], "correct": 0},
+        {"q": "Why is finding a niche important?", "a": ["It makes you an expert in a specific field", "It is easier to type", "It costs less"], "correct": 0}
+    ]
+},
+
+"online_tutor_lesson": {
+    "title": "Succeeding as an Online Tutor",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "Choosing Your Subjects", "content": "Focus on subjects you excel at, such as high school math, science, coding, or foreign languages. Determine what age group you are most comfortable teaching. Having a specialized focus helps you stand out to parents and students searching for help."},
+        {"title": "Creating a Virtual Classroom", "content": "A professional setup is essential for online tutoring. Ensure you have a quiet environment, reliable high-speed internet, a good webcam, and a clear microphone. Familiarize yourself with digital whiteboard tools and video conferencing platforms like Zoom or Google Meet."},
+        {"title": "Building Student Loyalty", "content": "Patience and clear communication are key. Prepare lesson plans in advance and track your student's progress. Encourage a positive learning environment by celebrating small victories. A satisfied student often leads to long-term work and referrals to other parents."}
+    ],
+    "quiz": [
+        {"q": "What is essential for an online tutoring setup?", "a": ["A quiet environment and good internet", "Loud music", "A television"], "correct": 0},
+        {"q": "How can you build student loyalty?", "a": ["By tracking progress and showing patience", "By ending sessions early", "By giving them no homework"], "correct": 0}
+    ]
+},
+
+"social_media_manager_lesson": {
+    "title": "Social Media Management",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "Understanding the Algorithms", "content": "Social Media Managers need to understand how different platforms work. Instagram favors visual aesthetic and Reels, Twitter focuses on timely text interactions, and LinkedIn is for professional networking. Mastering the algorithm of your chosen platforms is your biggest asset."},
+        {"title": "Content Calendars and Strategy", "content": "Consistency is key to growth. Use tools like Hootsuite or Buffer to schedule posts in advance using a Content Calendar. A good strategy mixes educational, entertaining, and promotional content. Analyze your engagement metrics to see what type of posts perform best."},
+        {"title": "Growing a Brand", "content": "Businesses hire social media managers to grow their audience and drive sales. Focus on community engagement—reply to comments, participate in trends, and collaborate with other creators. Building a loyal community is more valuable than just getting viral views."}
+    ],
+    "quiz": [
+        {"q": "Why is consistency important in social media?", "a": ["It keeps the audience engaged and satisfies algorithms", "It uses up data", "It annoys followers"], "correct": 0},
+        {"q": "What is a Content Calendar used for?", "a": ["Planning and scheduling posts in advance", "Tracking your physical workouts", "Recording expenses"], "correct": 0}
+    ]
+},
+
+"virtual_assistant_lesson": {
+    "title": "The Virtual Assistant Path",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "Core VA Skills", "content": "A Virtual Assistant (VA) helps business owners with administrative tasks. Essential skills include extreme organization, clear communication, and time management. You must be comfortable managing emails, scheduling calendar events, and handling customer inquiries remotely."},
+        {"title": "Mastering the Software Tools", "content": "Familiarity with modern productivity software is a must. You should master Google Workspace (Docs, Sheets, Drive), project management tools like Trello or Asana, and communication platforms like Slack. Being tech-savvy allows you to integrate seamlessly into a client's business."},
+        {"title": "Finding VA Opportunities", "content": "Join Facebook groups specifically for entrepreneurs or VAs where clients frequently post jobs. You can also create profiles on Upwork or Fiverr. Start by offering basic admin packages, and as you gain experience, you can offer premium services like market research or bookkeeping."}
+    ],
+    "quiz": [
+        {"q": "What is a core skill for a Virtual Assistant?", "a": ["Extreme organization", "Physical strength", "Cooking ability"], "correct": 0},
+        {"q": "Which tools should a VA master?", "a": ["Google Workspace and project management apps", "Video games", "Video editing software"], "correct": 0}
+    ]
 }
 
 }

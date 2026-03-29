@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internships & Opportunities - Teen Finance Guidance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .interest-pill {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            margin: 0.3rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .interest-pill.active {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .internship-card {
+            border-top: 4px solid #10b981;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 0.3rem;
+            margin-top: 0.3rem;
+            display: inline-block;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: #10b981;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #empty-state {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+        
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        
+        .tab-btn.active {
+            color: #10b981;
+            border-bottom: 2px solid #10b981;
+            font-weight: 600;
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            background: var(--surface);
+            color: white;
+            border: 1px solid var(--border);
+            padding: 0.5rem;
+            border-radius: 8px;
+            outline: none;
+        }
+
+    </style>
+</head>
+
+<body>
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/home'">
+            <i class="fas fa-rocket"></i>
+            Teen<span>Finance</span>
+        </div>
+        <button class="mobile-nav-toggle" id="nav-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="nav-menu">
+            <a href="/home" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/profile" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </a>
+            <a href="/internships" class="nav-item active" style="color: #10b981;">
+                <i class="fas fa-briefcase nav-icon"></i>
+                <span>Internships</span>
+            </a>
+            <button id="logout-btn" class="nav-item" style="background:none; border:none; cursor:pointer;">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="layout-container" style="padding-top: 6rem;">
+        
+        <div class="hero-section animate-fade-in" style="padding: 2rem 0; text-align: left;">
+            <h1 class="text-gradient" style="background: linear-gradient(90deg, #10b981, #3b82f6); -webkit-background-clip: text;">Internships & Opportunities</h1>
+            <p>Find real-world experience tailored to your interests.</p>
+        </div>
+
+        <section class="glass-card animate-fade-in" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">1. Select Your Interests</h3>
+            <div id="interests-container">
+                <div class="interest-pill" data-value="Finance & Banking">Finance & Banking</div>
+                <div class="interest-pill" data-value="Technology & Fintech">Technology & Fintech</div>
+                <div class="interest-pill" data-value="Marketing & Sales">Marketing & Sales</div>
+                <div class="interest-pill" data-value="Accounting & Audit">Accounting & Audit</div>
+                <div class="interest-pill" data-value="Entrepreneurship">Entrepreneurship</div>
+                <div class="interest-pill" data-value="Data & Analytics">Data & Analytics</div>
+            </div>
+            <button id="fetch-btn" class="btn" style="background: #10b981; color: white; margin-top: 1rem; padding: 0.8rem 2rem;">
+                <i class="fas fa-search"></i> Find Opportunities
+            </button>
+        </section>
+
+        <section>
+            <div class="tabs-header">
+                <button class="tab-btn active" id="tab-explore" onclick="switchTab('explore')">Explore</button>
+                <button class="tab-btn" id="tab-saved" onclick="switchTab('saved')">Saved (<span id="saved-count">0</span>)</button>
+            </div>
+
+            <div id="explore-view">
+                <div class="controls-bar" id="controls-bar" style="display: none;">
+                    <select class="filter-select" id="filter-remote">
+                        <option value="all">All Locations</option>
+                        <option value="remote">Remote Only</option>
+                    </select>
+                    <select class="filter-select" id="filter-stipend">
+                        <option value="all">Any Stipend</option>
+                        <option value="unpaid">Unpaid</option>
+                        <option value="paid">Paid</option>
+                    </select>
+                    <select class="filter-select" id="sort-results">
+                        <option value="latest">Sort by Latest</option>
+                        <option value="stipend">Highest Stipend</option>
+                    </select>
+                </div>
+
+                <div id="loading-spinner" class="spinner" style="display: none;"></div>
+                <div id="empty-state">No internships found. Try selecting different interests and hitting Find Opportunities.</div>
+                
+                <h3 id="res-title" style="display: none; margin-bottom: 1rem;">Live Opportunities</h3>
+                <div id="internship-grid" class="module-cover-grid" style="margin-bottom: 3rem;">
+                    <!-- Internship Cards populate here -->
+                </div>
+
+                <h3 id="companies-title" style="display: none; margin-top: 2rem; margin-bottom: 1rem; color: #10b981;">Top Companies Hiring</h3>
+                <div id="companies-grid" class="module-cover-grid" style="margin-bottom: 3rem;">
+                    <!-- Company Cards populate here -->
+                </div>
+            </div>
+
+            <div id="saved-view" style="display: none;">
+                <div id="saved-empty" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                    You haven't saved any opportunities yet.
+                </div>
+                <div id="saved-internship-grid" class="module-cover-grid">
+                    <!-- Saved items populate here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        // Init Check
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = '/login';
+
+        // Nav Toggle
+        document.getElementById('nav-toggle').addEventListener('click', () => {
+            const menu = document.getElementById('nav-menu');
+            menu.classList.toggle('active');
+            const i = document.querySelector('#nav-toggle i');
+            i.classList.toggle('fa-bars');
+            i.classList.toggle('fa-times');
+        });
+        
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await API.auth.logout();
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        });
+
+        // State Tracking
+        let currentInternships = [];
+        let currentCompanies = [];
+        let selectedInterests = [];
+        
+        let savedInternships = JSON.parse(localStorage.getItem('savedInternships')) || [];
+        updateSavedCount();
+
+        // Interests Selector Logic
+        document.querySelectorAll('.interest-pill').forEach(pill => {
+            pill.addEventListener('click', (e) => {
+                const target = e.target;
+                target.classList.toggle('active');
+                const val = target.getAttribute('data-value');
+                if (target.classList.contains('active')) {
+                    selectedInterests.push(val);
+                } else {
+                    selectedInterests = selectedInterests.filter(i => i !== val);
+                }
+            });
+        });
+
+        // Fetch Data
+        document.getElementById('fetch-btn').addEventListener('click', async () => {
+            if (selectedInterests.length === 0) {
+                alert("Please select at least one interest!");
+                return;
+            }
+
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.getElementById('internship-grid').innerHTML = '';
+            document.getElementById('companies-grid').innerHTML = '';
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('controls-bar').style.display = 'none';
+            document.getElementById('res-title').style.display = 'none';
+            document.getElementById('companies-title').style.display = 'none';
+
+            try {
+                const res = await fetch('/api/internships', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ interests: selectedInterests })
+                });
+
+                if(!res.ok) throw new Error("API call failed");
+                const data = await res.json();
+                
+                currentInternships = data.internships || [];
+                currentCompanies = data.companies || [];
+
+                document.getElementById('loading-spinner').style.display = 'none';
+                
+                if (currentInternships.length > 0 || currentCompanies.length > 0) {
+                    document.getElementById('controls-bar').style.display = 'flex';
+                    renderInternships(currentInternships, 'internship-grid');
+                    renderCompanies(currentCompanies);
+                } else {
+                    document.getElementById('empty-state').style.display = 'block';
+                }
+
+            } catch(e) {
+                console.error("Error fetching internships", e);
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('empty-state').style.display = 'block';
+                document.getElementById('empty-state').textContent = "Failed to load opportunities. Please try again later.";
+            }
+        });
+
+        // Save Functionality
+        window.toggleSave = function(idx) {
+            const item = currentInternships[idx];
+            const existsIdx = savedInternships.findIndex(s => s.company === item.company && s.role === item.role);
+            
+            if (existsIdx > -1) {
+                savedInternships.splice(existsIdx, 1);
+            } else {
+                savedInternships.push(item);
+            }
+            
+            localStorage.setItem('savedInternships', JSON.stringify(savedInternships));
+            updateSavedCount();
+            renderInternships(currentInternships, 'internship-grid'); // Re-render to update icon
+        }
+
+        window.removeSaved = function(idx) {
+            savedInternships.splice(idx, 1);
+            localStorage.setItem('savedInternships', JSON.stringify(savedInternships));
+            updateSavedCount();
+            renderSaved();
+            if (document.getElementById('tab-explore').classList.contains('active') && currentInternships.length > 0) {
+                renderInternships(currentInternships, 'internship-grid');
+            }
+        }
+
+        function updateSavedCount() {
+            document.getElementById('saved-count').textContent = savedInternships.length;
+        }
+
+        // Render Functions
+        function renderInternships(items, containerId, isSavedView = false) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            
+            if (!isSavedView) {
+                document.getElementById('res-title').style.display = 'block';
+            }
+
+            items.forEach((item, originalIdx) => {
+                const isSaved = savedInternships.some(s => s.company === item.company && s.role === item.role);
+                const saveIcon = isSaved ? 'fas fa-bookmark' : 'far fa-bookmark';
+                const saveColor = isSaved ? '#10b981' : 'var(--text-muted)';
+                const onClickStr = isSavedView ? `removeSaved(${originalIdx})` : `toggleSave(${originalIdx})`;
+
+                const skillsHTML = (item.skills || []).map(s => `<span class="tag">${s}</span>`).join('');
+                const fallbackLogo = `https://ui-avatars.com/api/?name=${item.company}&background=10b981&color=fff`;
+
+                container.innerHTML += `
+                    <div class="glass-card internship-card animate-fade-in">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div style="display: flex; gap: 0.8rem; align-items: center;">
+                                    <img src="${fallbackLogo}" style="width: 40px; height: 40px; border-radius: 8px;">
+                                    <div>
+                                        <h3 style="font-size: 1.1rem; margin-bottom: 0.2rem;">${item.role}</h3>
+                                        <div style="color: var(--text-muted); font-size: 0.9rem;">${item.company} • ${item.location}</div>
+                                    </div>
+                                </div>
+                                <button onclick="${onClickStr}" style="background: none; border: none; font-size: 1.2rem; color: ${saveColor}; cursor: pointer; transition: 0.3s;">
+                                    <i class="${saveIcon}"></i>
+                                </button>
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <div style="font-size: 0.85rem; margin-bottom: 0.4rem;"><i class="fas fa-coins" style="color:#fbbf24; width:20px;"></i> <b>Stipend:</b> ${item.stipend}</div>
+                                <div style="font-size: 0.85rem; margin-bottom: 0.4rem;"><i class="fas fa-clock" style="color:#60a5fa; width:20px;"></i> <b>Duration:</b> ${item.duration}</div>
+                                <div style="font-size: 0.85rem; margin-bottom: 0.4rem;"><i class="fas fa-calendar" style="color:#a855f7; width:20px;"></i> <b>Apply by:</b> ${item.deadline || "Rolling"}</div>
+                            </div>
+
+                            <div style="margin-bottom: 1.5rem;">
+                                ${skillsHTML}
+                            </div>
+                        </div>
+                        
+                        <a href="${item.apply_link}" target="_blank" class="btn" style="width: 100%; text-align: center; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981;">
+                            Apply Now <i class="fas fa-external-link-alt" style="margin-left: 0.5rem;"></i>
+                        </a>
+                    </div>
+                `;
+            });
+        }
+
+        function renderCompanies(companies) {
+            document.getElementById('companies-title').style.display = 'block';
+            const container = document.getElementById('companies-grid');
+            container.innerHTML = companies.map(c => `
+                <div class="glass-card animate-fade-in" style="border-top: 4px solid var(--primary);">
+                    <h3 style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                        ${c.name}
+                        <span style="font-size: 0.7rem; background: var(--surface); padding: 0.2rem 0.6rem; border-radius: 20px; color: var(--text-muted); border: 1px solid var(--border);">${c.industry}</span>
+                    </h3>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">${c.reason}</p>
+                    <a href="${c.link}" target="_blank" style="color: var(--primary); font-size: 0.9rem; font-weight: 600; text-decoration: none;">View Careers <i class="fas fa-arrow-right"></i></a>
+                </div>
+            `).join('');
+        }
+
+        function renderSaved() {
+            const container = document.getElementById('saved-internship-grid');
+            const empty = document.getElementById('saved-empty');
+            if (savedInternships.length === 0) {
+                container.innerHTML = '';
+                empty.style.display = 'block';
+            } else {
+                empty.style.display = 'none';
+                renderInternships(savedInternships, 'saved-internship-grid', true);
+            }
+        }
+
+        // Tab Logic
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${tabId}`).classList.add('active');
+            
+            if (tabId === 'explore') {
+                document.getElementById('explore-view').style.display = 'block';
+                document.getElementById('saved-view').style.display = 'none';
+            } else {
+                document.getElementById('explore-view').style.display = 'none';
+                document.getElementById('saved-view').style.display = 'block';
+                renderSaved();
+            }
+        }
+
+        // Filter & Sort Logic
+        function applyFilters() {
+            const remote = document.getElementById('filter-remote').value;
+            const stipend = document.getElementById('filter-stipend').value;
+            const sort = document.getElementById('sort-results').value;
+
+            let filtered = [...currentInternships];
+
+            if (remote === 'remote') {
+                filtered = filtered.filter(i => i.location.toLowerCase().includes('remote'));
+            }
+
+            if (stipend === 'unpaid') {
+                filtered = filtered.filter(i => i.stipend.toLowerCase().includes('unpaid'));
+            } else if (stipend === 'paid') {
+                filtered = filtered.filter(i => !i.stipend.toLowerCase().includes('unpaid'));
+            }
+
+            if (sort === 'stipend') {
+                filtered.sort((a,b) => {
+                    // Extract numbers hack for basic sorting
+                    const valA = parseInt(a.stipend.replace(/[^0-9]/g, '')) || 0;
+                    const valB = parseInt(b.stipend.replace(/[^0-9]/g, '')) || 0;
+                    return valB - valA;
+                });
+            }
+
+            renderInternships(filtered, 'internship-grid');
+        }
+
+        document.getElementById('filter-remote').addEventListener('change', applyFilters);
+        document.getElementById('filter-stipend').addEventListener('change', applyFilters);
+        document.getElementById('sort-results').addEventListener('change', applyFilters);
+
+    </script>
+</body>
+</html>

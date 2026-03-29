@@ -22,7 +22,7 @@ Teen Finance Guidance is a full-stack web application built with Flask and vanil
 - Badge system that rewards learning milestones
 - Part-time career guidance with step-by-step roadmaps for users aged 18 and above
 - Daily practice quiz with rotating questions
-- AI-powered finance assistant chatbot using the Gemini API
+
 - Profile management allowing users to update their age and skills
 
 ---
@@ -34,7 +34,7 @@ Teen Finance Guidance is a full-stack web application built with Flask and vanil
 | Frontend   | HTML, CSS, JavaScript             |
 | Backend    | Python, Flask                     |
 | Database   | SQLite                            |
-| AI Chatbot | Google Gemini API                 |
+
 | Icons      | Font Awesome                      |
 | Charts     | Chart.js                          |
 

@@ -734,7 +734,186 @@ input:focus, select:focus, textarea:focus {
 }
 
 @media (max-width: 768px) {
-    .btn {
-        width: 100%;
-    }
+}
+
+/* ============================
+   NETRA OS WIDGET
+   ============================ */
+.netra-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 9999;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.netra-toggle {
+    background: #0a0a0f;
+    border: 1px solid #06b6d4;
+    color: #06b6d4;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s;
+    letter-spacing: 2px;
+}
+
+.netra-toggle:hover {
+    background: rgba(6, 182, 212, 0.1);
+    box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
+}
+
+.netra-toggle .pulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #06b6d4;
+    border-radius: 50%;
+    animation: netraPulse 1.5s infinite;
+}
+
+@keyframes netraPulse {
+    0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(6, 182, 212, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+}
+
+.netra-window {
+    position: absolute;
+    bottom: 70px;
+    right: 0;
+    width: 350px;
+    height: 450px;
+    background: rgba(10, 10, 15, 0.95);
+    border: 1px solid #06b6d4;
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.2);
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    transition: opacity 0.3s, transform 0.3s;
+    transform-origin: bottom right;
+}
+
+.netra-window.hidden {
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+.netra-header {
+    background: rgba(6, 182, 212, 0.1);
+    border-bottom: 1px solid #06b6d4;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.netra-title {
+    color: #06b6d4;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    letter-spacing: 1px;
+}
+
+.status-dot {
+    width: 6px;
+    height: 6px;
+    background: #06b6d4;
+    border-radius: 50%;
+}
+
+.netra-close {
+    background: none;
+    border: none;
+    color: #06b6d4;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.netra-messages {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.netra-msg {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #a5f3fc;
+}
+
+.netra-msg.user {
+    color: #e2e8f0;
+}
+
+.netra-sender {
+    color: #06b6d4;
+    font-weight: bold;
+    margin-right: 6px;
+}
+
+.netra-input-area {
+    display: flex;
+    border-top: 1px solid #06b6d4;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+#netra-input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    padding: 12px 16px;
+    color: #06b6d4;
+    font-family: 'Courier New', Courier, monospace;
+    outline: none;
+}
+
+#netra-input::placeholder {
+    color: rgba(6, 182, 212, 0.4);
+}
+
+#netra-send {
+    background: rgba(6, 182, 212, 0.1);
+    border: none;
+    border-left: 1px solid #06b6d4;
+    color: #06b6d4;
+    padding: 0 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#netra-send:hover {
+    background: rgba(6, 182, 212, 0.3);
+}
+
+.typing-indicator .dots {
+    animation: netraDots 1.5s infinite steps(4, end);
+    display: inline-block;
+    width: 12px;
+    overflow: hidden;
+    vertical-align: bottom;
+}
+
+@keyframes netraDots {
+    0% { width: 0px; }
+    25% { width: 4px; }
+    50% { width: 8px; }
+    75% { width: 12px; }
+    100% { width: 12px; }
 }

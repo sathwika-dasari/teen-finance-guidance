@@ -1,12 +1,14 @@
-const API_BASE = '/api';
+const API_BASE = '';
 
 async function apiRequest(endpoint, method = 'GET', data = null) {
     const options = {
         method,
         headers: {
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'login'.includes('login') ? 'same-origin' : 'include' // safe same-origin
     };
+    options.credentials = 'same-origin';
 
     if (data) {
         options.body = JSON.stringify(data);
@@ -29,17 +31,22 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
 
 const API = {
     auth: {
-        register: (userData) => apiRequest('/auth/register', 'POST', userData),
-        login: (credentials) => apiRequest('/auth/login', 'POST', credentials),
-        logout: () => apiRequest('/auth/logout', 'POST'),
-        updateProfile: (data) => apiRequest('/auth/update_profile', 'POST', data)
+        register: (userData) => apiRequest('/api/auth/register', 'POST', userData),
+        login: (credentials) => apiRequest('/api/auth/login', 'POST', credentials),
+        logout: () => apiRequest('/api/auth/logout', 'POST'),
+        updateProfile: (data) => apiRequest('/api/auth/update_profile', 'POST', data)
     },
     recommendation: {
-        getGuidance: () => apiRequest('/recommendation/get_guidance'),
-        getLesson: (id) => apiRequest(`/recommendation/get_lesson/${id}`)
+        getGuidance: () => apiRequest('/api/recommendation/get_guidance'),
+        getLesson: (id) => apiRequest(`/api/recommendation/get_lesson/${id}`)
     },
     dashboard: {
-        getProgress: () => apiRequest('/dashboard/progress'),
-        updateProgress: (progressData) => apiRequest('/dashboard/update_progress', 'POST', progressData)
+        getProgress: () => apiRequest('/api/dashboard/progress'),
+        updateProgress: (progressData) => apiRequest('/api/dashboard/update_progress', 'POST', progressData)
+    },
+
+    // ✅ CHATBOT
+    chat: {
+        sendMessage: (message) => apiRequest('/chat', 'POST', { message })
     }
 };
