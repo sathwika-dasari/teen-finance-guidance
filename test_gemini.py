@@ -1,6 +1,6 @@
 from google import genai
 
-client = genai.Client(api_key="AIzaSyDgSFnCkyCJJNSkzGP8bmURE-PjXSSRdC4")
+client = genai.Client(api_key="Your Api key")
 
 models_to_test = [
     "gemini-2.5-flash", 
