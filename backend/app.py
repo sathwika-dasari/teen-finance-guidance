@@ -64,7 +64,7 @@ from flask import request, jsonify
 import time
 
 # 🔑 Set your API key here
-client = genai.Client(api_key="AIzaSyDgSFnCkyCJJNSkzGP8bmURE-PjXSSRdC4")
+client = genai.Client(api_key="Your api key")
 
 @app.route('/chat', methods=['POST'])
 def chat():
