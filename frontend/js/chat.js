@@ -1,44 +1,71 @@
-// NetraOS Chat Widget Controller
+// TeenFinance Interactive Chat Widget Controller
 document.addEventListener('DOMContentLoaded', () => {
     // Inject the widget HTML if it doesn't exist
-    if (!document.getElementById('netra-widget-container')) {
-        const widgetHTML = `
-            <div id="netra-widget-container" class="netra-widget">
-                <button id="netra-toggle-btn" class="netra-toggle">
-                    BUDDY <span class="pulse"></span>
-                </button>
-                <div id="netra-chat-window" class="netra-window hidden">
-                    <div class="netra-header">
-                        <div class="netra-title">
-                            <span class="status-dot"></span>
-                            COMPANION V2.4
-                        </div>
-                        <button id="netra-close-btn" class="netra-close">X</button>
-                    </div>
-                    <div id="netra-messages" class="netra-messages">
-                        <div class="netra-msg agent">
-                            <span class="netra-sender">BUDDY:</span>
-                            <span class="netra-text">Sensors online. Tactical guidance ready. State your inquiry.</span>
-                        </div>
-                    </div>
-                    <form id="netra-input-form" class="netra-input-area">
-                        <input type="text" id="netra-input" placeholder="Enter command..." autocomplete="off" />
-                        <button type="submit" id="netra-send"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></button>
-                    </form>
-                </div>
-            </div>
-        `;
+    if (!document.getElementById('chat-widget-container')) {
+        const timeNow = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        const widgetHTML = [
+            '<div id="chat-widget-container" class="chat-widget">',
+                '<button id="chat-toggle-btn" class="chat-fab">',
+                    '<i class="fas fa-robot"></i>',
+                '</button>',
+                '<div id="chat-window" class="chat-window hidden">',
+                    '<div class="chat-header">',
+                        '<div class="chat-avatar-top">',
+                            '<i class="fas fa-robot"></i>',
+                        '</div>',
+                        '<h3 class="chat-title">Teen Finance Assistant</h3>',
+                        '<p class="chat-subtitle">Ask anything about finance</p>',
+                        '<button class="chat-learn-more" onclick="window.location.href=\'/internships\'">Learn More</button>',
+                    '</div>',
+                    
+                    '<div class="chat-body-container">',
+                        '<div id="chat-messages" class="chat-messages">',
+                            '<div class="chat-timestamp">Today, ' + timeNow + '</div>',
+                            
+                            '<!-- Initial Bot Message -->',
+                            '<div class="chat-msg-row agent">',
+                                '<div class="chat-msg-avatar"><i class="fas fa-robot"></i></div>',
+                                '<div class="chat-bubble">',
+                                    'Hi 👋 I\'m your finance assistant!',
+                                '</div>',
+                            '</div>',
+                            
+                            '<!-- Quick Action Pills -->',
+                            '<div class="chat-quick-actions" id="chat-quick-actions">',
+                                '<button class="chat-pill">Find Internships</button>',
+                                '<button class="chat-pill">Safety Tips</button>',
+                                '<button class="chat-pill">System Help</button>',
+                                '<button class="chat-pill">Career Paths</button>',
+                            '</div>',
+                        '</div>',
+                        
+                        '<form id="chat-input-form" class="chat-input-area">',
+                            '<input type="text" id="chat-input" class="chat-input" placeholder="Type and press [enter]" autocomplete="off" />',
+                            '<div class="chat-actions">',
+                                '<i class="far fa-smile"></i>',
+                                '<i class="fas fa-paperclip"></i>',
+                                '<button type="submit" id="chat-send" class="chat-send-btn">',
+                                    '<i class="fas fa-paper-plane" style="font-size: 14px;"></i>',
+                                '</button>',
+                            '</div>',
+                        '</form>',
+                    '</div>',
+                '</div>',
+            '</div>'
+        ].join('');
         document.body.insertAdjacentHTML('beforeend', widgetHTML);
     }
 
-    const toggleBtn = document.getElementById('netra-toggle-btn');
-    const closeBtn = document.getElementById('netra-close-btn');
-    const chatWindow = document.getElementById('netra-chat-window');
-    const messageContainer = document.getElementById('netra-messages');
-    const inputForm = document.getElementById('netra-input-form');
-    const inputField = document.getElementById('netra-input');
-    const sendBtn = document.getElementById('netra-send');
-
+    const toggleBtn = document.getElementById('chat-toggle-btn');
+    const chatWindow = document.getElementById('chat-window');
+    const messageContainer = document.getElementById('chat-messages');
+    const inputForm = document.getElementById('chat-input-form');
+    const inputField = document.getElementById('chat-input');
+    const sendBtn = document.getElementById('chat-send');
+    const quickActions = document.getElementById('chat-quick-actions');
+    const pills = document.querySelectorAll('.chat-pill');
+    
     // Toggle Chat Window
     toggleBtn.addEventListener('click', () => {
         chatWindow.classList.toggle('hidden');
@@ -47,71 +74,101 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    closeBtn.addEventListener('click', () => {
-        chatWindow.classList.add('hidden');
-    });
-
     function addMessage(text, sender) {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `netra-msg ${sender}`;
+        const msgRow = document.createElement('div');
+        msgRow.className = 'chat-msg-row ' + sender;
         
-        const senderSpan = document.createElement('span');
-        senderSpan.className = 'netra-sender';
-        senderSpan.textContent = sender === 'agent' ? 'BUDDY:' : 'USER:';
+        let avatarHTML = '';
+        if (sender === 'agent') {
+            avatarHTML = '<div class="chat-msg-avatar"><i class="fas fa-robot"></i></div>';
+        }
 
-        const textSpan = document.createElement('span');
-        textSpan.className = 'netra-text';
-        textSpan.textContent = text; // Escapes HTML natively
-
-        msgDiv.appendChild(senderSpan);
-        msgDiv.appendChild(textSpan);
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
         
-        messageContainer.appendChild(msgDiv);
+        const formattedText = text
+            .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+            .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color: inherit; text-decoration: underline; font-weight: bold;">$1</a>');
+            
+        bubble.innerHTML = formattedText.replace(/\n/g, '<br>');
+
+        if (sender === 'agent') {
+            msgRow.innerHTML = avatarHTML;
+            msgRow.appendChild(bubble);
+        } else {
+            msgRow.appendChild(bubble);
+        }
+        
+        messageContainer.appendChild(msgRow);
         messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     function addTypingIndicator() {
         const div = document.createElement('div');
-        div.className = 'netra-msg agent typing-indicator';
-        div.id = 'netra-typing';
-        div.innerHTML = '<span class="netra-sender">BUDDY:</span><span class="netra-text">Analyzing<span class="dots">...</span></span>';
+        div.className = 'chat-msg-row agent typing-indicator';
+        div.id = 'chat-typing';
+        div.innerHTML = '<div class="chat-msg-avatar"><i class="fas fa-robot"></i></div>' +
+            '<div class="chat-bubble chat-dots"><span></span><span></span><span></span></div>';
         messageContainer.appendChild(div);
         messageContainer.scrollTop = messageContainer.scrollHeight;
     }
 
     function removeTypingIndicator() {
-        const el = document.getElementById('netra-typing');
+        const el = document.getElementById('chat-typing');
         if (el) el.remove();
     }
 
-    inputForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const msg = inputField.value.trim();
+    async function handleMessageSubmit(msg) {
         if (!msg) return;
+
+        // Hide quick actions once chat begins
+        if (quickActions) quickActions.style.display = 'none';
 
         addMessage(msg, 'user');
         inputField.value = '';
         inputField.disabled = true;
         sendBtn.disabled = true;
+        sendBtn.classList.remove('active');
 
         addTypingIndicator();
 
         try {
-            // Wait for api.js implementation
-            if (!API || !API.chat) {
-                throw new Error("API.chat is not defined");
-            }
+            if (!API || !API.chat) throw new Error("API.chat is not defined");
             const res = await API.chat.sendMessage(msg);
             removeTypingIndicator();
             addMessage(res.response, 'agent');
         } catch (error) {
             removeTypingIndicator();
             console.error(error);
-            addMessage("SYSTEM ERROR: Failed to communicate with main frame.", 'agent');
+            addMessage("Apologies! I could not reach the server right now. Try again later.", 'agent');
         } finally {
             inputField.disabled = false;
             sendBtn.disabled = false;
             inputField.focus();
+        }
+    }
+
+    // Input submit
+    inputForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleMessageSubmit(inputField.value.trim());
+    });
+    
+    // Quick pills clicking
+    pills.forEach(pill => {
+        pill.addEventListener('click', (e) => {
+            const query = e.target.textContent;
+            inputField.value = query;
+            handleMessageSubmit(query);
+        });
+    });
+
+    // Button active state logic
+    inputField.addEventListener('input', () => {
+        if (inputField.value.trim().length > 0) {
+            sendBtn.classList.add('active');
+        } else {
+            sendBtn.classList.remove('active');
         }
     });
 });

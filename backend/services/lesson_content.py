@@ -464,6 +464,97 @@ Learning these skills helps individuals build long-term financial stability."""
         {"q": "What is a core skill for a Virtual Assistant?", "a": ["Extreme organization", "Physical strength", "Cooking ability"], "correct": 0},
         {"q": "Which tools should a VA master?", "a": ["Google Workspace and project management apps", "Video games", "Video editing software"], "correct": 0}
     ]
+},
+
+"saving_money": {
+    "title": "Saving Money Strategies",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "The Power of Compound Interest", "content": "Compound interest is when you earn interest on both the money you've saved and the interest you've already earned. The earlier you start saving, the more time compound interest has to work its magic."},
+        {"title": "High Yield vs Standard Accounts", "content": "A high-yield savings account offers a significantly higher interest rate than a standard checking account. If you're saving for something more than a few months away, this is where your money should sit."}
+    ],
+    "quiz": [
+        {"q": "What is compound interest?", "a": ["Interest on both original money and accumulated interest", "A type of loan", "A bank fee"], "correct": 0},
+        {"q": "Where should you keep long-term savings?", "a": ["High-yield savings account", "Under the mattress", "Regular checking account"], "correct": 0}
+    ]
+},
+
+"basic_banking": {
+    "title": "Basic Banking",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "Checking vs Savings", "content": "A checking account is for daily transactions like buying food or paying bills. A savings account is for storing money securely to earn interest over time. You should transfer money from checking to savings regularly."},
+        {"title": "Hidden Fees", "content": "Banks sometimes charge maintenance fees, overdraft fees, or ATM fees. Always read the terms when opening an account. Look for student or teen accounts that waive these fees."}
+    ],
+    "quiz": [
+        {"q": "What is a checking account primarily used for?", "a": ["Daily transactions and spending", "Earning high interest", "Retirement savings"], "correct": 0},
+        {"q": "What should you watch out for when opening a bank account?", "a": ["Hidden fees like maintenance and overdrafts", "Free lollipops", "The color of the bank"], "correct": 0}
+    ]
+},
+
+"digital_payments": {
+    "title": "Digital Payments & UPI",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "How UPI Works", "content": "UPI (Unified Payments Interface) allows instant money transfer between bank accounts using a mobile phone. It is fast and typically fee-free, making it the most popular digital payment method today."},
+        {"title": "Setting up Secure PINs", "content": "Your UPI PIN is like your ATM PIN. Never share it, not even with the bank. If an app asks you to enter your PIN to 'receive' money, IT IS A SCAM. You only enter pins to SEND money."}
+    ],
+    "quiz": [
+        {"q": "Do you need to enter your UPI PIN to RECEIVE money?", "a": ["No, never. If asked, it's a scam.", "Yes, always.", "Only for large amounts."], "correct": 0},
+        {"q": "What does UPI do?", "a": ["Instant money transfers between bank accounts", "Generates cash", "Prints receipts"], "correct": 0}
+    ]
+},
+
+"understanding_credit": {
+    "title": "Understanding Credit",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "What is a Credit Card?", "content": "Unlike a debit card (which uses your own money), a credit card borrows money from the bank. You must pay it back at the end of the month. If you don't, you are charged extremely high interest."},
+        {"title": "Credit Scores", "content": "Your credit score is a number that shows banks how reliable you are at paying back debt. Paying your credit card on time builds a good score, making it easier to get cheap loans for cars or houses later in life."}
+    ],
+    "quiz": [
+        {"q": "What happens if you don't pay a credit card bill on time?", "a": ["You get charged high interest and your credit score drops", "Nothing happens", "The bank gives you more money"], "correct": 0},
+        {"q": "What is a credit score?", "a": ["A number showing how reliable you are with debt", "Your exam grades", "Your follower count"], "correct": 0}
+    ]
+},
+
+"side_income": {
+    "title": "Side Income Basics",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "What is a Side Hustle?", "content": "A side hustle is a way to make money outside of a primary job or school. Examples include freelancing, selling crafts online, or tutoring. It's a great way to accelerate your savings."},
+        {"title": "Time vs Value", "content": "When starting a side hustle, consider if you are trading time for money (like tutoring hourly) or creating value (like selling a digital course that can be bought many times without extra work). Both are valid but scale differently."}
+    ],
+    "quiz": [
+        {"q": "What is a side hustle?", "a": ["Extra work outside primary commitments to make money", "A type of dance", "A banking term"], "correct": 0},
+        {"q": "Which is an example of creating value that scales?", "a": ["Making a digital course once and selling it infinitely", "Walking dogs by the hour", "Mowing lawns"], "correct": 0}
+    ]
+},
+
+"mutual_funds": {
+    "title": "Mutual Funds",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "What is a Mutual Fund?", "content": "Instead of trying to pick one winning stock, a mutual fund pools money from many investors to buy a massive diversified collection of stocks or bonds. It lowers the risk of losing money if one single company fails."},
+        {"title": "SIPs (Systematic Investment Plans)", "content": "An SIP is a method where you invest a fixed, small amount of money into a mutual fund every month instead of one huge amount. It helps balance out the highs and lows of the market over time."}
+    ],
+    "quiz": [
+        {"q": "Why are mutual funds less risky than picking a single stock?", "a": ["Because they are diversified across many companies", "Because the government guarantees them", "Because they don't involve money"], "correct": 0},
+        {"q": "What is an SIP?", "a": ["Investing a fixed amount regularly every month", "A quick rich scheme", "A type of debit card"], "correct": 0}
+    ]
+},
+
+"risk_management": {
+    "title": "Risk Management",
+    "image": "../assets/intro_finance.png",
+    "topics": [
+        {"title": "The Golden Rule of Risk", "content": "Generally, higher potential returns come with higher risk. If an investment promises you 50% returns in a week with 'no risk', you are being lied to. It's crucial to understand the worst-case scenario before investing."},
+        {"title": "Diversification", "content": "Don't put all your eggs in one basket. Risk management means spreading your money across different types of investments (savings accounts, mutual funds, gold) so that if one sector crashes, you don't lose everything."}
+    ],
+    "quiz": [
+        {"q": "What does diversification mean in finance?", "a": ["Spreading money across multiple investments to reduce risk", "Putting all money in one stock", "Hiding money in different rooms"], "correct": 0},
+        {"q": "If an investment promises massive returns with zero risk, what is it likely?", "a": ["A scam or highly misleading", "A safe choice", "A government program"], "correct": 0}
+    ]
 }
 
 }

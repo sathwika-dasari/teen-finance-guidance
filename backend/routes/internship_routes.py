@@ -59,82 +59,118 @@ FALLBACK_COMPANIES = [
 ]
 
 
-@internship_bp.route('/', methods=['POST'])
-def get_internships():
+import time
+from datetime import datetime
+
+# Simple in-memory cache to mirror Node.js instructions
+cache = {}
+
+@internship_bp.route('/live', methods=['POST'])
+def get_live_internships():
     try:
         data = request.get_json()
         interests = data.get('interests', [])
+        completedModules = data.get('completedModules', [])
+        ageGroup = data.get('ageGroup', "13-19")
         
-        if not interests:
-            interests_str = "Technology & Fintech, Finance & Banking"
-        else:
-            interests_str = ", ".join(interests)
+        # Build cache key
+        inter_str = ",".join(sorted(interests))
+        mod_str = ",".join(sorted([str(m) for m in completedModules]))
+        cache_key = f"{inter_str}_{mod_str}"
 
-        # We will attempt to call Gemini using urllib to avoid missing dependency issues
+        # Check cache (valid for 30 mins)
+        if cache_key in cache:
+            if (time.time() - cache[cache_key]['time']) < (30 * 60):
+                return jsonify(cache[cache_key]['data']), 200
+
+        # Build prompt strings
+        interests_desc = ", ".join(interests) if interests else "General Finance and Tech"
+        modules_desc = ", ".join([str(m) for m in completedModules]) if completedModules else "none yet"
+
+        from google import genai
+        
+        # Load API key securely from environment — never hardcode keys
         gemini_api_key = os.environ.get('GEMINI_API_KEY')
-        
-        # In case it's not set in os.environ but we want to fail gracefully
         if not gemini_api_key:
-            print("GEMINI_API_KEY not found in environment. Using fallback data.")
-            return jsonify({
-                "internships": FALLBACK_INTERNSHIPS,
-                "companies": FALLBACK_COMPANIES
-            }), 200
+            return jsonify({"error": "Server configuration error: GEMINI_API_KEY is not set."}), 503
 
-        prompt = f"""
-        You are an expert career advisor.
-        Based on the user's interests: [{interests_str}], provide a JSON output containing two lists:
-        1. "internships": List 8 real internship opportunities for teenagers and young adults (aged 16-22). 
-           For each internship include: 
-           - "company" (string)
-           - "role" (string title)
-           - "stipend" (string, e.g. '₹8,000' or 'Unpaid')
-           - "duration" (string, e.g. '2 months')
-           - "location" (string, Remote or City)
-           - "skills" (list of strings)
-           - "apply_link" (string URL)
-           - "deadline" (string)
-        2. "companies": List 6 top companies hiring in these fields that are good for teens.
-           For each company include:
-           - "name" (string)
-           - "industry" (string)
-           - "reason" (string, why it's good for teens)
-           - "link" (string careers page URL link)
+        client = genai.Client(api_key=gemini_api_key)
 
-        Return ONLY a valid JSON object with the keys "internships" and "companies". Do not wrap it in markdown codeblocks.
-        """
+        prompt = f"""You are an internship research assistant for teenagers aged {ageGroup}.
+Given interests: {interests_desc}.
+Completed learning modules: {modules_desc}.
 
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={gemini_api_key}"
-        payload = {
-            "contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"response_mime_type": "application/json"}
-        }
+Return a JSON object with two keys:
+1. "internships": array of 8-12 real internship opportunities from major companies and startups relevant to the interests above. Each object must have:
+   - role (string): job title
+   - company (string): company name
+   - location (string): e.g. "Remote", "Bengaluru", "Mumbai", "Delhi", "Hyderabad", "Pan India"
+   - stipend (string): e.g. "₹10,000/month", "₹5,000/month", "Unpaid", "Performance-based"
+   - duration (string): e.g. "2 months", "3 months", "6 weeks"
+   - deadline (string): a realistic future ISO date string (within next 60-90 days from today) or null for rolling
+   - apply_link (string): real official URL to the company careers or internship page (e.g. careers.google.com, careers.microsoft.com, internshala.com, linkedin.com/jobs etc.)
+   - skills (array of strings): 3-5 relevant skills
+   - is_filled (boolean): always false for new listings
+   - is_summer (boolean): true if it is a summer internship program
+   - description (string): one sentence max 100 chars describing the role
 
-        req = urllib.request.Request(url, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'})
+2. "companies": array of 5 major companies currently known for hiring interns in the given interest areas. Each object must have:
+   - name (string)
+   - industry (string)
+   - reason (string): one sentence on why they are great for interns
+   - link (string): real careers page URL
+
+Important rules:
+- Prioritise real, well-known companies: Google, Microsoft, Amazon, Meta, Goldman Sachs, McKinsey, Deloitte, Zerodha, CRED, Flipkart, Infosys, TCS, HDFC Bank, Zomato, Swiggy, Razorpay, BYJU's, Unacademy, Internshala, AngelList.
+- Include at least 2-3 summer internship programs (is_summer: true).
+- Mix remote and in-person locations.
+- Mix paid and unpaid stipends.
+- All apply_link values must be real, publicly accessible URLs.
+- Return ONLY valid JSON. No markdown, no backticks, no explanation text."""
+
+        response = client.models.generate_content(
+            model='gemini-2.5-flash',
+            contents=prompt,
+        )
         
-        with urllib.request.urlopen(req, timeout=15) as response:
-            result = json.loads(response.read().decode('utf-8'))
-            
-            # Parse gemini text
-            text_response = result['candidates'][0]['content']['parts'][0]['text']
-            
-            # Clean up potential markdown formatting 
-            if text_response.startswith('```json'):
-                text_response = text_response[7:-3]
-            elif text_response.startswith('```'):
-                text_response = text_response[3:-3]
+        text = response.text
+        if text.startswith("```json"):
+            text = text.split("```json")[1]
+        if text.startswith("```"):
+             text = text.split("```")[1]
+        if "```" in text:
+             text = text.split("```")[0]
+             
+        text = text.strip()
+        parsed_data = json.loads(text)
+
+        # Filter out past-deadline internships before sending to client
+        if "internships" in parsed_data:
+            valid_internships = []
+            today = datetime.now()
+            for item in parsed_data["internships"]:
+                if not item.get("deadline"):
+                    valid_internships.append(item)
+                    continue
                 
-            parsed_data = json.loads(text_response)
-            
-            return jsonify({
-                "internships": parsed_data.get("internships", FALLBACK_INTERNSHIPS),
-                "companies": parsed_data.get("companies", FALLBACK_COMPANIES)
-            }), 200
+                try:
+                    # Clean ISO format if Z is missing
+                    dl_str = item["deadline"].replace("Z", "+00:00")
+                    deadline_date = datetime.fromisoformat(dl_str)
+                    # Use naive datetime comparison
+                    if deadline_date.replace(tzinfo=None) >= today:
+                        valid_internships.append(item)
+                except ValueError:
+                    # If date is completely malformed, let it through as rolling or handle it gracefully
+                    valid_internships.append(item)
+                    
+            parsed_data["internships"] = valid_internships
+
+        # Cache the result
+        cache[cache_key] = {"data": parsed_data, "time": time.time()}
+
+        return jsonify(parsed_data), 200
 
     except Exception as e:
-        print(f"Error calling Gemini or parsing: {e}")
-        # Always fallback on error
-        return jsonify({
-            "internships": FALLBACK_INTERNSHIPS,
-            "companies": FALLBACK_COMPANIES
-        }), 200
+        print("Gemini API error:", str(e))
+        return jsonify({"error": "Failed to fetch internships", "details": str(e)}), 500

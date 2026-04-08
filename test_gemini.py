@@ -1,6 +1,15 @@
+import os
+from dotenv import load_dotenv
 from google import genai
 
-client = genai.Client(api_key="Your Api key")
+# Load environment variables from .env
+load_dotenv()
+
+_api_key = os.environ.get("GEMINI_API_KEY")
+if not _api_key:
+    raise RuntimeError("GEMINI_API_KEY is not set. Add it to your .env file.")
+
+client = genai.Client(api_key=_api_key)
 
 models_to_test = [
     "gemini-2.5-flash", 

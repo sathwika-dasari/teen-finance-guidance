@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opportunities & Guidance - Teen Finance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .interest-pill {
+            display: inline-block;
+            padding: 0.6rem 1.2rem;
+            margin: 0.3rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .interest-pill.active {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: #10b981;
+            color: #10b981;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.2);
+        }
+
+        .job-card {
+            border-top: 4px solid #10b981;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.75rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .badge-summer {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+            border: 1px solid #3b82f6;
+            margin-right: 5px;
+        }
+
+        /* FILLED / EXPIRED CARD CSS */
+        .card-filled {
+            opacity: 0.45;
+        }
+        .card-filled .apply-btn {
+            pointer-events: none;
+            background: rgba(255,255,255,0.05) !important;
+            border-color: var(--border) !important;
+            color: var(--text-muted) !important;
+        }
+        .filled-badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.6rem;
+            background: rgba(239, 68, 68, 0.15) !important;
+            color: #ef4444 !important;
+            border: 1px solid #ef4444 !important;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .safety-tip {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+            padding: 0.8rem;
+            margin-top: 1rem;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.8rem;
+            color: #fca5a5;
+            margin-bottom: 1rem;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: #10b981;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #empty-state {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .controls-bar label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .controls-bar select {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: white;
+            font-size: 0.9rem;
+        }
+        
+        .status-dropdown {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--surface-2);
+            color: white;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-NotApplied { background: #94a3b8; }
+        .status-Applied { background: #3b82f6; }
+        .status-Interview { background: #f59e0b; }
+        .status-Offer { background: #10b981; }
+        
+    </style>
+</head>
+
+<body>
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/home'">
+            <i class="fas fa-rocket"></i>
+            Teen<span>Finance</span>
+        </div>
+        <button class="mobile-nav-toggle" id="nav-toggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="nav-links" id="nav-menu">
+            <a href="/home" class="nav-item">
+                <i class="fas fa-home nav-icon"></i>
+                <span>Home</span>
+            </a>
+            <a href="/dashboard" class="nav-item">
+                <i class="fas fa-chart-line nav-icon"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/profile" class="nav-item">
+                <i class="fas fa-user nav-icon"></i>
+                <span>Profile</span>
+            </a>
+            <a href="/internships" class="nav-item active" style="color: #10b981;">
+                <i class="fas fa-briefcase nav-icon"></i>
+                <span>Opportunities</span>
+            </a>
+            <button id="logout-btn" class="nav-item" style="background:none; border:none; cursor:pointer;">
+                <i class="fas fa-sign-out-alt nav-icon"></i>
+                <span>Logout</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="layout-container" style="padding-top: 6rem;">
+        
+        <div class="hero-section animate-fade-in" style="padding: 2rem 0; text-align: left;">
+            <h1 class="text-gradient" style="background: linear-gradient(90deg, #10b981, #3b82f6); -webkit-background-clip: text; background-clip: text;">AI Internship Discovery</h1>
+            <p>Listings are AI-generated based on real companies and programs. Always verify the apply link on the official company website before submitting any application. Never pay to apply. Involve a parent or guardian for any offline or in-person role.</p>
+        </div>
+
+        <div id="personalization-banner" class="glass-card" style="border-left: 4px solid #3b82f6; margin-bottom: 2rem; background: rgba(59, 130, 246, 0.05); display: none;">
+            <h4 style="color: #3b82f6; margin-bottom: 0.5rem;"><i class="fas fa-magic"></i> PERSONALIZED FOR YOU</h4>
+            <p id="personalization-text" style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0;"></p>
+        </div>
+
+        <section class="glass-card animate-fade-in" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Target Focus</h3>
+            <div id="interests-container">
+                <div class="interest-pill active" data-value="All">All Domains</div>
+                <div class="interest-pill" data-value="Finance & Banking">Finance & Banking</div>
+                <div class="interest-pill" data-value="Technology & Fintech">Technology & Fintech</div>
+                <div class="interest-pill" data-value="Data & Analytics">Data Science</div>
+                <div class="interest-pill" data-value="Entrepreneurship">Entrepreneurship</div>
+                <div class="interest-pill" data-value="Summer Programs">Summer Programs</div>
+                <div class="interest-pill" data-value="Consulting">Consulting</div>
+                <div class="interest-pill" data-value="Product Management">Product Management</div>
+                <div class="interest-pill" data-value="Government / PSU">Government / PSU</div>
+                <div class="interest-pill" data-value="Writing">Writing</div>
+                <div class="interest-pill" data-value="Design">Design</div>
+            </div>
+            
+            <div style="margin-top: 1.5rem; margin-bottom: 1rem; display: flex; gap: 0.8rem;">
+                <input type="text" id="custom-search" placeholder="E.g. Space Engineering, Game Dev, Robotics..." style="flex: 1; padding: 0.8rem 1.2rem; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: white; font-size: 0.95rem; outline: none;">
+                <button id="search-btn" class="btn btn-primary" style="display: flex; gap: 0.5rem; align-items: center;">
+                    <i class="fas fa-search"></i> Search AI
+                </button>
+            </div>
+            
+            <!-- Filters -->
+            <div class="controls-bar">
+                <label>
+                    <input type="checkbox" id="filter-summer-only"> Summer Only
+                </label>
+                <label>
+                    <input type="checkbox" id="filter-major-only"> Major Companies Only
+                </label>
+                <label>
+                    <select id="sort-deadline">
+                        <option value="">Sort By...</option>
+                        <option value="closing_soon">Closing Soon</option>
+                    </select>
+                </label>
+                <button class="btn btn-secondary btn-sm" onclick="fetchLiveInternships(false)" style="margin-left: auto;">
+                    <i class="fas fa-sync-alt"></i> Force Refresh
+                </button>
+            </div>
+
+            <!-- External Direct Search Links -->
+            <div id="external-searches" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">Search these platforms directly with your filters:</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a id="search-linkedin" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:flex; align-items:center; gap:0.5rem; background: rgba(10, 102, 194, 0.1); color: #60a5fa; border: 1px solid rgba(10,102,194,0.3);"><i class="fab fa-linkedin"></i> LinkedIn</a>
+                    <a id="search-google" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:flex; align-items:center; gap:0.5rem; background: rgba(234, 67, 53, 0.1); color: #f87171; border: 1px solid rgba(234,67,53,0.3);"><i class="fab fa-google"></i> Google Careers</a>
+                    <a id="search-internshala" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:flex; align-items:center; gap:0.5rem; background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.3);"><i class="fas fa-graduation-cap"></i> Internshala</a>
+                    <a id="search-unstop" href="#" target="_blank" class="btn btn-secondary btn-sm" style="display:flex; align-items:center; gap:0.5rem; background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168,85,247,0.3);"><i class="fas fa-rocket"></i> Unstop</a>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <div id="loading-spinner" class="spinner" style="display: none;"></div>
+            <div id="empty-state">No open internships found. Try selecting different interests.</div>
+            
+            <!-- Main Grid -->
+            <div id="job-grid" class="module-cover-grid" style="margin-bottom: 3rem;"></div>
+            
+            <!-- Summer Sub-grid -->
+            <h3 id="summer-title" style="display: none; margin-top: 2rem; margin-bottom: 1rem; color: #3b82f6;"><i class="fas fa-sun"></i> Summer Internship Programs</h3>
+            <div id="summer-grid" class="module-cover-grid" style="margin-bottom: 3rem;"></div>
+            
+            <!-- Top Companies -->
+            <h3 id="companies-title" style="display: none; margin-top: 2rem; margin-bottom: 1rem; color: #10b981;"><i class="fas fa-building"></i> Top Companies Hiring Interns</h3>
+            <div id="companies-grid" class="module-cover-grid" style="margin-bottom: 3rem;"></div>
+            
+            <!-- Fallback Ecosystem -->
+            <div id="fallback-platforms" style="display: none; margin-bottom: 3rem;">
+                <h3 style="color: #f59e0b; margin-bottom: 1rem;"><i class="fas fa-compass"></i> Explore these trusted platforms:</h3>
+                <div class="module-cover-grid">
+                    <div class="glass-card"><a target="_blank" href="https://internshala.com" style="color:white; text-decoration:none; font-weight:600;">Internshala <i class="fas fa-external-link-alt"></i></a></div>
+                    <div class="glass-card"><a target="_blank" href="https://linkedin.com/jobs" style="color:white; text-decoration:none; font-weight:600;">LinkedIn Jobs <i class="fas fa-external-link-alt"></i></a></div>
+                    <div class="glass-card"><a target="_blank" href="https://campus.naukri.com" style="color:white; text-decoration:none; font-weight:600;">Naukri Campus <i class="fas fa-external-link-alt"></i></a></div>
+                    <div class="glass-card"><a target="_blank" href="https://careers.google.com" style="color:white; text-decoration:none; font-weight:600;">Google Careers <i class="fas fa-external-link-alt"></i></a></div>
+                    <div class="glass-card"><a target="_blank" href="https://careers.microsoft.com" style="color:white; text-decoration:none; font-weight:600;">Microsoft Careers <i class="fas fa-external-link-alt"></i></a></div>
+                    <div class="glass-card"><a target="_blank" href="https://unstop.com" style="color:white; text-decoration:none; font-weight:600;">Unstop <i class="fas fa-external-link-alt"></i></a></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (!user) window.location.href = '/login';
+
+        document.getElementById('nav-toggle').addEventListener('click', () => {
+            const menu = document.getElementById('nav-menu');
+            menu.classList.toggle('active');
+            const i = document.querySelector('#nav-toggle i');
+            i.classList.toggle('fa-bars');
+            i.classList.toggle('fa-times');
+        });
+        
+        document.getElementById('logout-btn').addEventListener('click', async () => {
+            await API.auth.logout();
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        });
+
+        const MAJOR_COMPANIES = ["google", "microsoft", "amazon", "meta", "goldman sachs", "mckinsey", "deloitte", "zerodha", "cred", "flipkart", "infosys", "tcs", "wipro", "hdfc", "zomato", "swiggy", "razorpay"];
+        
+        // Modules -> Pill Mapping
+        const moduleMap = {
+            "budgeting_101": "Finance & Banking",
+            "investing_stocks": "Finance & Banking",
+            "freelance_dev_lesson": "Technology & Fintech",
+            "risk_management": "Data & Analytics",
+            "side_income": "Entrepreneurship"
+        };
+
+        let selectedInterests = [];
+        let completedModules = [];
+        let fetchedData = null; // Store for client-side filtering
+
+        // Status Management
+        const statusCache = JSON.parse(localStorage.getItem('internshipStatus')) || {};
+        window.updateStatus = function(companyRole, val) {
+            statusCache[companyRole] = val;
+            localStorage.setItem('internshipStatus', JSON.stringify(statusCache));
+            const cardDot = document.getElementById(`dot-${companyRole.replace(/[^a-zA-Z0-9]/g, '')}`);
+            if (cardDot) {
+                cardDot.className = `status-dot status-${val.replace(' ', '')}`;
+            }
+        }
+
+        async function initPage() {
+            // Get module completion from API rather than localStorage mapping for real logic
+            try {
+                const progressArr = await API.dashboard.getProgress();
+                completedModules = progressArr.filter(p => p.status === 'completed').map(p => p.module_name);
+            } catch(e) {
+                console.error("Could not fetch progress:", e);
+                completedModules = [];
+            }
+
+            // Check Personalisation
+            if (completedModules.length > 0) {
+                let mappedInterests = new Set();
+                let modNames = [];
+                completedModules.forEach(m => {
+                    modNames.push(m);
+                    if (moduleMap[m]) mappedInterests.add(moduleMap[m]);
+                });
+
+                if (mappedInterests.size > 0) {
+                    const banner = document.getElementById('personalization-banner');
+                    banner.style.display = 'block';
+                    document.getElementById('personalization-text').textContent = 
+                        `Based on your progress in ${modNames.join(', ')}, we've pre-selected relevant interests for you.`;
+
+                    // Remove active from All
+                    document.querySelector('.interest-pill[data-value="All"]').classList.remove('active');
+                    
+                    // Add mapped interests dynamically
+                    mappedInterests.forEach(mi => {
+                        const target = document.querySelector(`.interest-pill[data-value="${mi}"]`);
+                        if (target) {
+                            target.classList.add('active');
+                            if (!selectedInterests.includes(mi)) selectedInterests.push(mi);
+                        }
+                    });
+                }
+            }
+
+            // Bind Pills
+            document.querySelectorAll('.interest-pill').forEach(pill => {
+                pill.addEventListener('click', (e) => {
+                    const val = e.target.getAttribute('data-value');
+                    // Clear custom search box if pill is clicked
+                    document.getElementById('custom-search').value = "";
+                    
+                    if (val === 'All') {
+                         document.querySelectorAll('.interest-pill').forEach(p => p.classList.remove('active'));
+                         e.target.classList.add('active');
+                         selectedInterests = [];
+                    } else {
+                         document.querySelector('.interest-pill[data-value="All"]').classList.remove('active');
+                         if (e.target.classList.contains('active')) {
+                             e.target.classList.remove('active');
+                             selectedInterests = selectedInterests.filter(i => i !== val);
+                             if (selectedInterests.length === 0) {
+                                 document.querySelector('.interest-pill[data-value="All"]').classList.add('active');
+                             }
+                         } else {
+                             e.target.classList.add('active');
+                             selectedInterests.push(val);
+                         }
+                    }
+                    updateExternalSearchLinks();
+                    fetchLiveInternships(false);
+                });
+            });
+
+            // Bind Custom Search
+            const customSearchInput = document.getElementById('custom-search');
+            const searchBtn = document.getElementById('search-btn');
+            
+            function triggerCustomSearch() {
+                const val = customSearchInput.value.trim();
+                if (val) {
+                    // Remove 'active' from all pills if doing a custom text search to avoid confusion
+                    document.querySelectorAll('.interest-pill').forEach(p => p.classList.remove('active'));
+                    selectedInterests = [val]; // Override interests with custom search
+                    updateExternalSearchLinks();
+                    fetchLiveInternships(false);
+                }
+            }
+
+            searchBtn.addEventListener('click', triggerCustomSearch);
+            customSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') triggerCustomSearch();
+            });
+
+            // Bind Filters
+            document.getElementById('filter-summer-only').addEventListener('change', renderCachedJobs);
+            document.getElementById('filter-major-only').addEventListener('change', renderCachedJobs);
+            document.getElementById('sort-deadline').addEventListener('change', renderCachedJobs);
+
+            updateExternalSearchLinks();
+            fetchLiveInternships(false);
+        }
+
+        function updateExternalSearchLinks() {
+            const query = selectedInterests.length > 0 ? selectedInterests.join(' ') : "internship opportunities";
+            const qEncoded = encodeURIComponent("internship " + query);
+            const qPlus = "internship+" + query.replace(/ /g, '+');
+            
+            document.getElementById('search-linkedin').href = `https://www.linkedin.com/jobs/search/?keywords=${qEncoded}`;
+            document.getElementById('search-google').href = `https://www.google.com/search?q=site:careers.google.com+${qPlus}`;
+            document.getElementById('search-internshala').href = `https://internshala.com/internships/keywords-${query.toLowerCase().replace(/[^a-z0-9]/g, '%20')}`;
+            document.getElementById('search-unstop').href = `https://unstop.com/opportunities?query=${qEncoded}`;
+        }
+
+        function getDeadlineDisplay(deadlineISO) {
+            if (!deadlineISO) return { text: "Rolling / No deadline", color: "#10b981", filled: false };
+            const dl = new Date(deadlineISO);
+            if (isNaN(dl.getTime())) return { text: deadlineISO, color: "#10b981", filled: false };
+            
+            const days = Math.ceil((dl - new Date()) / (1000 * 60 * 60 * 24));
+            if (days <= 0) return { text: "Deadline Passed", color: "#ef4444", filled: true };
+            if (days === 1) return { text: "Closes today!", color: "#ef4444", filled: false };
+            if (days <= 3) return { text: `Closes in ${days} days`, color: "#ef4444", filled: false };
+            if (days <= 7) return { text: `Closes in ${days} days`, color: "#f59e0b", filled: false };
+            return { text: `Closes in ${days} days`, color: "#10b981", filled: false };
+        }
+
+        async function fetchLiveInternships(force) {
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.getElementById('job-grid').innerHTML = '';
+            document.getElementById('summer-grid').innerHTML = '';
+            document.getElementById('companies-grid').innerHTML = '';
+            document.getElementById('summer-title').style.display = 'none';
+            document.getElementById('companies-title').style.display = 'none';
+            document.getElementById('empty-state').style.display = 'none';
+            document.getElementById('fallback-platforms').style.display = 'none';
+
+            try {
+                // Post to python/flask backend route equivalent mapped previously
+                const res = await fetch('/api/internships/live', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        interests: selectedInterests,
+                        completedModules: completedModules,
+                        ageGroup: "13-19"
+                    })
+                });
+
+                if(!res.ok) throw new Error("API call failed");
+                fetchedData = await res.json();
+                
+                document.getElementById('loading-spinner').style.display = 'none';
+                renderCachedJobs();
+
+            } catch(e) {
+                console.error("Error fetching live jobs via Gemini", e);
+                document.getElementById('loading-spinner').style.display = 'none';
+                document.getElementById('fallback-platforms').style.display = 'block';
+            }
+        }
+
+        function renderCachedJobs() {
+            if (!fetchedData) return;
+            
+            let internships = fetchedData.internships || [];
+            const companies = fetchedData.companies || [];
+            
+            // Client filtering
+            const summerOnly = document.getElementById('filter-summer-only').checked;
+            const majorOnly = document.getElementById('filter-major-only').checked;
+            const sortMode = document.getElementById('sort-deadline').value;
+
+            if (summerOnly) {
+                internships = internships.filter(j => j.is_summer === true);
+            }
+            if (majorOnly) {
+                internships = internships.filter(j => {
+                    const c = j.company ? j.company.toLowerCase() : "";
+                    return MAJOR_COMPANIES.some(maj => c.includes(maj));
+                });
+            }
+            if (sortMode === 'closing_soon') {
+                internships.sort((a, b) => {
+                    if (!a.deadline) return 1;
+                    if (!b.deadline) return -1;
+                    return new Date(a.deadline) - new Date(b.deadline);
+                });
+            }
+
+            const isSummerArr = internships.filter(j => j.is_summer);
+            const isStandardArr = internships.filter(j => !j.is_summer);
+
+            renderJobGroup('job-grid', isStandardArr);
+            renderJobGroup('summer-grid', isSummerArr);
+
+            if (isSummerArr.length > 0) {
+                document.getElementById('summer-title').style.display = 'block';
+            } else {
+                document.getElementById('summer-title').style.display = 'none';
+            }
+
+            if (internships.length === 0) {
+                document.getElementById('empty-state').style.display = 'block';
+            } else {
+                document.getElementById('empty-state').style.display = 'none';
+            }
+
+            if (companies && companies.length > 0) {
+                 renderCompanies(companies);
+            }
+        }
+
+        function renderJobGroup(containerId, jobs) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = jobs.map(job => {
+                const dlStatus = getDeadlineDisplay(job.deadline);
+                
+                const isActuallyFilled = job.is_filled || dlStatus.filled;
+                const cardFilledClass = isActuallyFilled ? 'card-filled' : '';
+                const mainBadgeClass = isActuallyFilled ? 'filled-badge' : 'badge';
+                const mainBadgeText = isActuallyFilled ? (job.is_filled ? "Position Filled" : "Deadline Passed") : dlStatus.text;
+                const applyBtnState = isActuallyFilled ? 'disabled' : '';
+                
+                const cname = (job.company || "Company").toLowerCase().replace(/[^a-z0-9]/g, '');
+                const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(job.company)}&background=10b981&color=fff`;
+                const clearbitLogo = `https://logo.clearbit.com/${cname}.com`;
+                
+                const cacheKey = `${job.company}-${job.role}`;
+                const safeKey = cacheKey.replace(/[^a-zA-Z0-9]/g, '');
+                const currentStat = statusCache[cacheKey] || 'Not Applied';
+
+                const skillsHTML = (job.skills || []).map(s => `<span style="font-size: 0.75rem; background: rgba(255,255,255,0.05); padding: 0.2rem 0.6rem; border-radius: 12px; margin-right: 0.4rem; border: 1px solid var(--border);">${s}</span>`).join('');
+
+                return `
+                    <div class="glass-card job-card animate-fade-in ${cardFilledClass}">
+                        <div class="badge ${mainBadgeClass}" style="${!isActuallyFilled ? `color: ${dlStatus.color}; border: 1px solid ${dlStatus.color}; background: ${dlStatus.color.replace(')', ', 0.1)').replace('rgb', 'rgba')};` : ''}">
+                            <i class="far fa-clock"></i> ${mainBadgeText}
+                        </div>
+                        
+                        <div>
+                            <div style="display: flex; gap: 0.8rem; align-items: start; margin-bottom: 1rem; padding-right: 6rem;">
+                                <img src="${clearbitLogo}" onerror="this.onerror=null; this.src='${fallbackLogo}';" style="width: 48px; height: 48px; border-radius: 8px; background: white; padding: 2px;">
+                                <div>
+                                    <h3 style="font-size: 1.1rem; margin-bottom: 0.2rem;">${job.role}</h3>
+                                    <div style="color: var(--text-muted); font-size: 0.9rem; font-weight: 600;">
+                                        ${job.company}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem; color: #cbd5e1; font-size: 0.9rem; line-height: 1.5;">
+                                ${job.description || ''}
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem; background: rgba(0,0,0,0.2); padding: 0.8rem; border-radius: 8px;">
+                                <div style="font-size: 0.85rem; margin-bottom: 0.4rem;">
+                                    <i class="fas fa-map-marker-alt" style="color:#a855f7; width:20px;"></i> <b>Location:</b> ${job.location}
+                                </div>
+                                <div style="font-size: 0.85rem; margin-bottom: 0.4rem;">
+                                    <i class="fas fa-money-bill-wave" style="color:#10b981; width:20px;"></i> <b>Stipend:</b> ${job.stipend}
+                                </div>
+                                <div style="font-size: 0.85rem; margin-bottom: 0.2rem;">
+                                    <i class="far fa-calendar-alt" style="color:#3b82f6; width:20px;"></i> <b>Duration:</b> ${job.duration}
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                ${skillsHTML}
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <div style="display: flex; gap: 1rem; align-items: center; justify-content: space-between; margin-top: 1rem;">
+                                <select class="status-dropdown" onchange="updateStatus('${cacheKey}', this.value)" style="flex: 1;">
+                                    <option value="Not Applied" ${currentStat === 'Not Applied' ? 'selected' : ''}>Not Applied</option>
+                                    <option value="Applied" ${currentStat === 'Applied' ? 'selected' : ''}>Applied</option>
+                                    <option value="Interview" ${currentStat === 'Interview' ? 'selected' : ''}>Interview Scheduled</option>
+                                    <option value="Offer" ${currentStat === 'Offer' ? 'selected' : ''}>Offer Received</option>
+                                </select>
+                                <span class="status-dot status-${currentStat.replace(' ', '')}" id="dot-${safeKey}" title="Current Status"></span>
+                            </div>
+                            
+                            <a href="${job.apply_link || '#'}" target="_blank" class="btn apply-btn" ${applyBtnState} style="display: block; width: 100%; text-align: center; margin-top: 1rem; background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; color: #10b981; text-decoration: none;">
+                                Apply Officially <i class="fas fa-external-link-alt" style="margin-left: 0.5rem;"></i>
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderCompanies(companies) {
+            document.getElementById('companies-title').style.display = 'block';
+            const container = document.getElementById('companies-grid');
+            container.innerHTML = companies.map(c => {
+                const cname = (c.name || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+                const fallbackLogo = `https://ui-avatars.com/api/?name=${encodeURIComponent(c.name)}&background=10b981&color=fff`;
+                const clearbitLogo = `https://logo.clearbit.com/${cname}.com`;
+                
+                return `
+                <div class="glass-card animate-fade-in" style="border-top: 4px solid var(--primary); display: flex; flex-direction: column; justify-content: space-between;">
+                    <div>
+                        <h3 style="margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                            <div style="display:flex; align-items: center; gap: 0.8rem;">
+                                <img src="${clearbitLogo}" onerror="this.onerror=null; this.src='${fallbackLogo}';" style="width: 30px; height: 30px; border-radius: 4px; background: white; padding: 2px;">
+                                ${c.name}
+                            </div>
+                            <span style="font-size: 0.7rem; background: var(--surface); padding: 0.2rem 0.6rem; border-radius: 20px; color: var(--text-muted); border: 1px solid var(--border);">${c.industry}</span>
+                        </h3>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">${c.reason}</p>
+                    </div>
+                    <a href="${c.link}" target="_blank" class="btn btn-secondary btn-sm" style="width: 100%; text-align:center;">View Careers <i class="fas fa-arrow-right"></i></a>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Boot
+        initPage();
+
+    </script>
+</body>
+</html>

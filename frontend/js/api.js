@@ -44,6 +44,11 @@ const API = {
         getProgress: () => apiRequest('/api/dashboard/progress'),
         updateProgress: (progressData) => apiRequest('/api/dashboard/update_progress', 'POST', progressData)
     },
+    learning: {
+        getPath: () => apiRequest('/api/learning/path'),
+        completeLesson: (data) => apiRequest('/api/learning/complete_lesson', 'POST', data),
+        generateLesson: (data) => apiRequest('/api/learning/generate_lesson', 'POST', data)
+    },
 
     // ✅ CHATBOT
     chat: {

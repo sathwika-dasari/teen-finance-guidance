@@ -401,13 +401,16 @@
             <div class="section-header">
                 <div>
                     <h2 id="module-title">Your Learning Path</h2>
-                    <p id="module-desc" style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;"></p>
+                    <p id="module-desc" style="font-size:0.85rem; color:var(--text-muted); margin-top:0.25rem;">Explore the gamified path to financial mastery.</p>
                 </div>
-                <span class="badge badge-primary" id="lesson-count-badge"></span>
+                <div style="display: flex; gap: 1rem; align-items: center;">
+                    <span class="badge badge-primary" id="lesson-count-badge"></span>
+                    <a href="/learning_path" class="btn btn-primary">Start Learning Now 🚀</a>
+                </div>
             </div>
 
             <div id="lessons-list" class="module-cover-grid" style="margin-top: 1rem;">
-                <!-- Injected by JS -->
+                <!-- Lessons are still visible here, but primary flow goes to the new Path -->
                 <div class="skeleton" style="height:140px;"></div>
                 <div class="skeleton" style="height:140px; opacity:0.6;"></div>
                 <div class="skeleton" style="height:140px; opacity:0.35;"></div>
@@ -785,38 +788,59 @@
 
         async function loadDashboard() {
             try {
-                const [guidance, progress] = await Promise.all([
+                const [guidance, progress, learningPath] = await Promise.all([
                     API.recommendation.getGuidance(),
-                    API.dashboard.getProgress()
+                    API.dashboard.getProgress(),
+                    API.learning.getPath()
                 ]);
 
                 // ── Module title
                 document.getElementById('module-title').textContent = guidance.title || 'Your Learning Path';
 
-                // ── Lessons list
+                // ── Lessons list (show up to 3 next active lessons from the new path)
                 const lessonsList = document.getElementById('lessons-list');
-                const lessons = guidance.lessons || [];
+                
+                // Flatten the path tree to find unlocked, unfinished lessons
+                let activeLessons = [];
+                if (learningPath && learningPath.path) {
+                    learningPath.path.forEach(tier => {
+                        tier.lessons.forEach(lesson => {
+                            if (lesson.status === 'unlocked') {
+                                activeLessons.push(lesson);
+                            }
+                        });
+                    });
+                }
+                
+                activeLessons = activeLessons.slice(0, 3); // Show top 3 unlocked ones
+
                 const completedCount = progress.filter(p => p.status === 'completed').length;
-                const totalModules = lessons.length;
+                // Calculate total modules by counting all lessons in the path tree
+                let totalModules = 0;
+                if (learningPath && learningPath.path) {
+                    learningPath.path.forEach(tier => {
+                        totalModules += tier.lessons.length;
+                    });
+                }
                 const remaining = totalModules - completedCount;
                 const percent = totalModules > 0 ? Math.round((completedCount / totalModules) * 100) : 0;
 
-                lessonsList.innerHTML = lessons.length === 0
+                lessonsList.innerHTML = activeLessons.length === 0
                     ? `<div class="empty-state" style="grid-column: 1 / -1;">
-                            <i class="fas fa-book-open"></i>
-                            <p>No lessons found yet.<br>Check back soon!</p>
+                            <i class="fas fa-trophy"></i>
+                            <p>You've completed all available lessons!<br>Check back later or generate an AI lesson.</p>
                        </div>`
-                    : lessons.map((lesson, i) => {
-                        const isDone = progress.find(p => p.module_name === lesson.id && p.status === 'completed');
+                    : activeLessons.map(lesson => {
                         return `
-                            <div class="module-cover-card animate-fade-in" onclick="window.location.href='/lessons?id=${lesson.id}'" style="border: ${isDone ? '2px solid var(--success)' : '1px solid var(--border)'};">
-                                <img src="${lesson.image || ''}" alt="${lesson.title}" onerror="this.src='../assets/default.png'">
+                            <div class="module-cover-card animate-fade-in" onclick="window.location.href='/lessons?id=${lesson.id}'" style="border: 1px solid var(--border);">
+                                <div style="font-size: 3rem; text-align: center; padding: 1.5rem 0; color: #a855f7;">
+                                    <i class="fas ${lesson.icon}"></i>
+                                </div>
                                 <div class="module-cover-overlay">
                                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                                         <h3>${lesson.title}</h3>
-                                        ${isDone ? '<div class="check-icon" style="width: 24px; height: 24px;"><i class="fas fa-check"></i></div>' : ''}
                                     </div>
-                                    <p style="font-size: 0.8rem; opacity: 0.9;">${lesson.desc || ''}</p>
+                                    <p style="font-size: 0.8rem; opacity: 0.9;">Start Lesson →</p>
                                 </div>
                             </div>`;
                     }).join('');
@@ -892,17 +916,29 @@
                 }
 
                 // ── Lesson count badge
-                document.getElementById('lesson-count-badge').textContent = `${totalModules} Lessons`;
+                const badge = document.getElementById('lesson-count-badge');
+                if (badge) badge.textContent = `${totalModules} Lessons`;
 
                 // ── Stats
-                document.getElementById('progress-percent').textContent = `${percent}%`;
-                document.getElementById('stat-done').textContent = completedCount;
-                document.getElementById('stat-remaining').textContent = remaining;
-                document.getElementById('stat-total').textContent = totalModules;
-                document.getElementById('completed-modules').textContent =
-                    completedCount > 0
-                        ? `${completedCount} of ${totalModules} module${totalModules !== 1 ? 's' : ''} completed — keep it up! 🚀`
-                        : `No modules finished yet — start one below!`;
+                const pPercent = document.getElementById('progress-percent');
+                if (pPercent) pPercent.textContent = `${percent}%`;
+                
+                const sDone = document.getElementById('stat-done');
+                if (sDone) sDone.textContent = completedCount;
+                
+                const sRemaining = document.getElementById('stat-remaining');
+                if (sRemaining) sRemaining.textContent = remaining;
+                
+                const sTotal = document.getElementById('stat-total');
+                if (sTotal) sTotal.textContent = totalModules;
+                
+                const completedModulesEl = document.getElementById('completed-modules');
+                if (completedModulesEl) {
+                    completedModulesEl.textContent =
+                        completedCount > 0
+                            ? `${completedCount} of ${totalModules} module${totalModules !== 1 ? 's' : ''} completed — keep it up! 🚀`
+                            : `No modules finished yet — start one below!`;
+                }
 
                 // ── Chart
                 initChart(percent);

@@ -1,3 +1,9 @@
+import os
+from dotenv import load_dotenv
+
+# Load .env variables before anything else (no-op if running in production with real env vars)
+load_dotenv()
+
 from flask import Flask, send_from_directory
 from flask_cors import CORS
 from backend.config import Config
@@ -5,7 +11,9 @@ from backend.routes.auth_routes import auth_bp
 from backend.routes.recommendation import recommend_bp
 from backend.routes.dashboard_routes import dashboard_bp
 from backend.routes.internship_routes import internship_bp
-import os
+from backend.routes.job_routes import job_bp
+from backend.routes.learning_routes import learning_bp
+from backend.models.job_model import JobModel
 
 app = Flask(__name__, static_folder='../frontend')
 app.config.from_object(Config)
@@ -16,6 +24,12 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(recommend_bp, url_prefix='/api/recommendation')
 app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(internship_bp, url_prefix='/api/internships')
+app.register_blueprint(job_bp, url_prefix='/api/jobs')
+app.register_blueprint(learning_bp, url_prefix='/api/learning')
+
+# Seed jobs
+with app.app_context():
+    JobModel.seed_sample_jobs()
 
 # Serve Static Files
 @app.route('/')
@@ -43,6 +57,10 @@ def serve_profile():
 def serve_lessons():
     return send_from_directory(app.static_folder, 'screens/lessons.html')
 
+@app.route('/learning_path')
+def serve_learning_path():
+    return send_from_directory(app.static_folder, 'screens/learning_path.html')
+
 @app.route('/daily')
 def serve_daily():
     return send_from_directory(app.static_folder, 'screens/daily_practice.html')
@@ -53,7 +71,7 @@ def serve_parttime():
 
 @app.route('/internships')
 def serve_internships():
-    return send_from_directory(app.static_folder, 'screens/internships.html')
+    return send_from_directory(app.static_folder, 'screens/jobs.html')
 
 @app.route('/<path:path>')
 def serve_static(path):
@@ -63,8 +81,15 @@ from google import genai
 from flask import request, jsonify
 import time
 
-# 🔑 Set your API key here
-client = genai.Client(api_key="Your api key")
+# 🔑 Load Gemini API key securely from environment variables (.env file)
+_gemini_api_key = os.environ.get("GEMINI_API_KEY")
+if not _gemini_api_key:
+    raise RuntimeError(
+        "GEMINI_API_KEY is not set. "
+        "Please add it to your .env file: GEMINI_API_KEY=your_key_here"
+    )
+client = genai.Client(api_key=_gemini_api_key)
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -74,8 +99,15 @@ def chat():
     if not user_message:
         return jsonify({"response": "Error: Empty message."})
     
-    # Tactical context for NetraOS
-    system_prompt = "You are COMPANION, a tactical visual assistant. Use a concise, tactical, and assertive tone. You are assisting a user in the Teen Finance Guidance platform. Provide helpful, short financial guidance when asked."
+    # Dynamic context for Teen Finance Guide
+    system_prompt = f"""You are COMPANION, an interactive, helpful, and knowledgeable guide for the Teen Finance Guidance platform.
+Your role is to handle any questions regarding internship doubts, system usage, career advice, and financial literacy. 
+You must be conversational and supportive to teenagers. Act as a powerful, unconstrained AI like Google Gemini. 
+When the user asks for internship opportunities, resources, or career paths based on their interests, DO NOT provide fake placeholder examples.
+Instead, use your vast knowledge base to generate REAL-WORLD internship opportunities from major companies (e.g., Google, Microsoft, Amazon, local startups) and direct them to real career platforms (like LinkedIn, Internshala, Unstop).
+Provide 3-5 real concrete examples with their direct, actual external apply URLs (using markdown linking, e.g., [Apply at Google](https://careers.google.com/students/)).
+ALWAYS strongly remind teenagers to verify employers on official platforms, involve parents for offline roles, and never pay any fees to join."""
+    
     full_prompt = f"System: {system_prompt}\nUser: {user_message}"
 
     for attempt in range(3):
