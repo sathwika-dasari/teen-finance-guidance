@@ -2,3 +2,4 @@ backend/database.db
 __pycache__/ 
 *.pyc 
 .env 
+scratch/

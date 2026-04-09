@@ -128,10 +128,25 @@ Important rules:
 - All apply_link values must be real, publicly accessible URLs.
 - Return ONLY valid JSON. No markdown, no backticks, no explanation text."""
 
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=prompt,
-        )
+        for attempt in range(3):
+            try:
+                response = client.models.generate_content(
+                    model='gemini-flash-latest',
+                    contents=prompt,
+                )
+                break
+            except Exception as e:
+                print(f"Retry {attempt+1} failed: {e}")
+                if attempt < 2:
+                    time.sleep(2)
+                    continue
+                # If all retries fail, fall back to static data
+                print("All Gemini API retries failed. Serving fallback internships.")
+                return jsonify({
+                    "internships": FALLBACK_INTERNSHIPS,
+                    "companies": FALLBACK_COMPANIES,
+                    "is_fallback": True
+                }), 200
         
         text = response.text
         if text.startswith("```json"):
@@ -173,4 +188,10 @@ Important rules:
 
     except Exception as e:
         print("Gemini API error:", str(e))
-        return jsonify({"error": "Failed to fetch internships", "details": str(e)}), 500
+        # Final safety fallback for parsing errors or unexpected crashes
+        return jsonify({
+            "internships": FALLBACK_INTERNSHIPS,
+            "companies": FALLBACK_COMPANIES,
+            "is_fallback": True,
+            "error_detail": str(e)
+        }), 200

@@ -174,11 +174,25 @@ def generate_lesson():
     Do NOT include any text outside the JSON block.
     """
     
+    for attempt in range(3):
+        try:
+            response = client.models.generate_content(
+                model='gemini-flash-latest',
+                contents=system_prompt,
+            )
+            break
+        except Exception as e:
+            if attempt < 2:
+                import time
+                time.sleep(2)
+                continue
+            error_msg = str(e)
+            if "429" in error_msg or "RESOURCE_EXHAUSTED" in error_msg:
+                return jsonify({"message": "Our AI teacher is taking a short break (quota limit). Please try again in a few moments!"}), 503
+            print(f"Error generating AI lesson after retries: {e}")
+            return jsonify({"message": "Failed to generate lesson via AI"}), 500
+
     try:
-        response = client.models.generate_content(
-            model='gemini-2.5-flash',
-            contents=system_prompt,
-        )
         text = response.text
         
         # Parse JSON from markdown blocks
@@ -193,5 +207,5 @@ def generate_lesson():
         return jsonify(custom_lesson), 200
         
     except Exception as e:
-        print(f"Error generating AI lesson: {e}")
+        print(f"Error parsing AI lesson: {e}")
         return jsonify({"message": "Failed to generate lesson via AI"}), 500

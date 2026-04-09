@@ -86,11 +86,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const bubble = document.createElement('div');
         bubble.className = 'chat-bubble';
         
-        const formattedText = text
+        // Advanced formatting
+        let formattedText = text
             .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
             .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank" style="color: inherit; text-decoration: underline; font-weight: bold;">$1</a>');
             
-        bubble.innerHTML = formattedText.replace(/\n/g, '<br>');
+        // Basic bullet points handler
+        if (formattedText.includes('\n- ') || formattedText.includes('\n* ')) {
+            formattedText = formattedText.replace(/^[-*] (.*$)/gim, '<li>$1</li>');
+            formattedText = formattedText.replace(/(<li>.*<\/li>)/sim, '<ul>$1</ul>');
+        } else if (formattedText.trim().startsWith('- ') || formattedText.trim().startsWith('* ')) {
+             formattedText = formattedText.replace(/^[-*] (.*$)/gim, '<li>$1</li>');
+             formattedText = '<ul>' + formattedText + '</ul>';
+        }
+
+        bubble.innerHTML = formattedText.replace(/\n/g, '<br>').replace(/<\/ul><br>/g, '</ul>');
 
         if (sender === 'agent') {
             msgRow.innerHTML = avatarHTML;
@@ -121,8 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function handleMessageSubmit(msg) {
         if (!msg) return;
 
-        // Hide quick actions once chat begins
-        if (quickActions) quickActions.style.display = 'none';
+        // Hide quick actions once chat begins (keep them visible for the first interaction)
+        // if (quickActions) quickActions.style.display = 'none';
 
         addMessage(msg, 'user');
         inputField.value = '';
@@ -135,12 +145,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             if (!API || !API.chat) throw new Error("API.chat is not defined");
             const res = await API.chat.sendMessage(msg);
+            
+            // Artificial delay for "thinking" feel
+            await new Promise(r => setTimeout(r, 600));
+            
             removeTypingIndicator();
             addMessage(res.response, 'agent');
         } catch (error) {
             removeTypingIndicator();
             console.error(error);
-            addMessage("Apologies! I could not reach the server right now. Try again later.", 'agent');
+            addMessage("Apologies! COMPANION is having a minor connection issue. Please try again later.", 'agent');
         } finally {
             inputField.disabled = false;
             sendBtn.disabled = false;
