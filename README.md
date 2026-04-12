@@ -4,155 +4,93 @@ A personalized financial literacy web application designed to help teenagers and
 
 ---
 
-## Overview
+## 🌟 Key Features
 
-Teen Finance Guidance is a full-stack web application built with Flask and vanilla JavaScript. The platform delivers personalized financial education content based on the user's age and skills. Younger users receive foundational finance lessons while older users are guided toward advanced financial planning and part-time income opportunities.
-
----
-
-## Features
-
-- User authentication with secure password hashing
-- Personalized lesson content based on user age and profile
-- Interactive topic-based lessons with expandable sections
-- Quiz system to test knowledge after each lesson
-- Scam detection game built into the Scam Prevention lesson
-- Progress tracking dashboard with a completion chart
-- Seven-day streak tracker to encourage daily learning
-- Badge system that rewards learning milestones
-- Part-time career guidance with step-by-step roadmaps for users aged 18 and above
-- Daily practice quiz with rotating questions
-
-- Profile management allowing users to update their age and skills
+- **Adaptive Learning Path**: Rule-based difficulty engine that adjusts content (Easy/Hard) based on user quiz performance.
+- **Interactive Budget Simulator**: Visualize wealth projection with real-time Chart.js charts and monthly variables.
+- **Scam Detective Game**: Expanded with 5+ India-specific scenarios (UPI fraud, Remote Access, etc.) and educational feedback.
+- **Guardian Dashboard**: New role-based interface allowing parents/guardians to link to students and monitor Progress (XP, Streaks, Module Scores).
+- **Proactive Security**: 
+    - Moved Gemini AI to a secure backend proxy (`/api/chat`).
+    - Full **CSRF Protection** via Flask-WTF.
+    - Rate limiting on sensitive endpoints.
+    - SQLite **WAL Mode** for high-performance concurrent database access.
+- **Gamification**: XP system, 7-day streaks, and badge rewards.
+- **AI-Powered Discovery**: Personalized job and internship recommendations using Google Gemini.
 
 ---
 
-## Tech Stack
+## 🚀 Tech Stack
 
 | Layer      | Technology                        |
 |------------|-----------------------------------|
-| Frontend   | HTML, CSS, JavaScript             |
+| Frontend   | HTML5, Vanilla CSS, JavaScript (ES6+) |
 | Backend    | Python, Flask                     |
-| Database   | SQLite                            |
-
-| Icons      | Font Awesome                      |
-| Charts     | Chart.js                          |
+| Database   | SQLite (WAL Mode enabled)         |
+| Core APIs  | Google Gemini AI (Backend Proxy)  |
+| Libraries  | Chart.js, Font Awesome, Flask-WTF |
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 ```
 teen-finance-guidance/
-│
 ├── backend/
-│   ├── app.py                  # Main Flask application
-│   ├── config.py               # Application configuration
-│   ├── database.db             # SQLite database
-│   │
-│   ├── models/
-│   │   ├── user_model.py       # User table and methods
-│   │   └── progress_model.py   # Learning progress table
-│   │
-│   ├── routes/
-│   │   ├── auth_routes.py      # Authentication and profile APIs
-│   │   ├── recommendation.py   # Lesson recommendation API
-│   │   └── dashboard_routes.py # Progress dashboard APIs
-│   │
-│   ├── services/
-│   │   └── rule_engine.py      # Rule-based recommendation logic
-│   │
-│   └── utils/
-│       └── db_connection.py    # SQLite connection handler
-│
+│   ├── app.py                  # Main Flask app & route registry
+│   ├── config.py               # Security & DB configurations
+│   ├── database.db             # SQLite DB (WAL Mode)
+│   ├── models/                 # UserModel, Progress, Gamification
+│   ├── routes/                 # Auth, Learning, Chat (Proxy), Jobs
+│   ├── services/               # RuleEngine, LessonContent
+│   └── utils/                  # DB Connection with WAL init
 ├── frontend/
-│   ├── screens/
-│   │   ├── login.html          # Login and registration page
-│   │   ├── home.html           # Home page
-│   │   ├── lessons.html        # Lesson viewer and quiz
-│   │   ├── dashboard.html      # Progress dashboard
-│   │   ├── profile.html        # User profile and badges
-│   │   ├── daily_practice.html # Daily quiz
-│   │   └── parttime.html       # Part-time career guidance
-│   │
-│   ├── css/
-│   │   └── style.css           # Global stylesheet
-│   │
-│   └── js/
-│       └── api.js              # API communication layer
-│
-├── database/
-│   └── schema.sql              # Database schema
-│
-├── requirements.txt            # Python dependencies
-└── README.md                   # Project documentation
+│   ├── screens/                # All UI pages (Dashboard, Guardian, etc.)
+│   ├── css/                    # Glassmorphism & Modern UI styling
+│   └── js/                     # API utility with CSRF handling
+├── database/                   # Schema.sql & migrations
+├── .env.example                # Template for secrets
+└── README.md                   # You are here
 ```
 
 ---
 
-## Installation and Setup
+## 🛠️ Installation and Setup
 
-### Step 1 - Clone the repository
+### 1. Clone & Install
 ```bash
 git clone https://github.com/YOUR_USERNAME/teen-finance-guidance.git
 cd teen-finance-guidance
-```
-
-### Step 2 - Install Python dependencies
-```bash
 pip install -r requirements.txt
 ```
 
-### Step 3 - Set up the database
+### 2. Configure Environment
+Rename `.env.example` to `.env` and add your **GEMINI_API_KEY**.
+```env
+GEMINI_API_KEY=your_key_here
+FLASK_SECRET_KEY=your_random_secret
+```
+
+### 3. Initialize Database
 ```bash
-python -m backend.init_db
+# Run migration script to set up tables and WAL mode
+python migrate.py
 ```
 
-### Step 4 - Configure the Gemini API key
-
-Open `frontend/screens/home.html` and replace the placeholder with your API key obtained from Google AI Studio.
-```javascript
-const GEMINI_API_KEY = 'YOUR_API_KEY_HERE';
-```
-
-### Step 5 - Start the Flask server
+### 4. Run the Dev Server
 ```bash
 python -m backend.app
 ```
-
-### Step 6 - Open the application in your browser
-```
-http://localhost:5000/screens/login.html
-```
+Then visit `http://localhost:5000/` in your browser.
 
 ---
 
-## Pages Overview
+## 🛡️ Security & Performance
 
-| Page              | Description                                              |
-|-------------------|----------------------------------------------------------|
-| Login / Register  | Account creation and login                               |
-| Home              | Dashboard with streak tracker, modules, and daily quiz   |
-| Lessons           | Topic lessons with accordion content and quiz            |
-| Scam Detective    | Interactive scam identification game                     |
-| Dashboard         | Progress chart and lesson completion overview            |
-| Profile           | User information, earned badges, and profile update      |
-| Daily Practice    | Ten rotating daily finance questions                     |
-| Part-Time Guidance| Career recommendations and roadmaps for users aged 18 plus|
+- **Environment Secrets**: No API keys are exposed in the frontend. All AI logic is proxied through the backend.
+- **CSRF Tokens**: All `POST` requests in the frontend automatically fetch and inject a CSRF token from the API.
+- **SQLite WAL**: Enabled "Write-Ahead Logging" to prevent database locks during concurrent student/guardian sessions.
 
 ---
 
-## Security Notes
-
-Passwords are stored as hashed values using the Werkzeug library. User sessions are managed server-side through Flask. The Gemini API key should never be committed to version control. The .gitignore file is configured to exclude the database file and any environment variable files.
-
----
-
-## License
-
-This project was built for educational purposes.
-
----
-
-## Author
-
-Developed as a financial literacy platform for teenagers and young adults.
+## 📜 License
+Developed as a premium financial literacy platform for teenagers and young adults.

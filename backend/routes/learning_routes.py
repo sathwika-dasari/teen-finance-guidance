@@ -91,6 +91,8 @@ def get_learning_path():
         "gamification": stats
     }), 200
 
+from ..services.rule_engine import RuleEngine
+
 @learning_bp.route('/complete_lesson', methods=['POST'])
 def complete_lesson():
     user_id = session.get('user_id')
@@ -107,14 +109,33 @@ def complete_lesson():
     # Update progress
     ProgressModel.update_progress(user_id, module_name, 'completed', score)
     
-    # Award gamification XP (e.g., 50 XP per standard lesson, + bonus for score)
+    # Adaptive Difficulty Logic
+    # We'll use the session to track consecutive correct across lessons
+    session_stats = session.get('learning_stats', {"consecutive_correct": 0, "total_wrong": 0})
+    
+    # If score is 100%, we assume all consecutive correct for that lesson's length
+    # For simplicity, let's treat 100% as 'all correct' and <100% as 'at least one wrong'
+    is_perfect = (score == 100)
+    
+    # Update difficulty using RuleEngine
+    # We pass a flag if they got it "right" (perfect) or "wrong" (any error)
+    new_diff, cons_corr, tot_wrong = RuleEngine.update_difficulty(user_id, is_perfect, session_stats)
+    
+    # Update session stats
+    session['learning_stats'] = {
+        "consecutive_correct": cons_corr,
+        "total_wrong": tot_wrong
+    }
+
+    # Award gamification XP
     earned_xp = 50 + int((score / 100) * 50)
     new_stats = GamificationModel.add_xp_and_update_streak(user_id, earned_xp)
     
     return jsonify({
         "message": "Lesson completed successfully!",
         "earned_xp": earned_xp,
-        "new_stats": new_stats
+        "new_stats": new_stats,
+        "new_difficulty": new_diff
     }), 200
 
 @learning_bp.route('/generate_lesson', methods=['POST'])

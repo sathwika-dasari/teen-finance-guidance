@@ -961,15 +961,15 @@ input:focus, select:focus, textarea:focus {
 .chat-input {
     flex: 1;
     border: none;
-    background: transparent;
+    background: transparent !important;
     padding: 8px 10px;
     font-size: 15px;
-    color: #334155;
+    color: #1e293b !important; /* Dark Slate 800 for high visibility */
     outline: none;
 }
 
 .chat-input::placeholder {
-    color: #94a3b8;
+    color: #64748b !important; /* Slate 500 for better placeholder visibility */
 }
 
 .chat-actions {

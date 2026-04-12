@@ -138,9 +138,9 @@ If an offer sounds too good to be true, it is probably a scam."""
     ],
 
     "quiz": [
-        {"q": "What is phishing?", "a": ["Fake messages or websites used to steal information", "Fishing hobby", "Banking service"], "correct": 0},
-        {"q": "What should you do if someone asks for your password?", "a": ["Share it", "Never share it", "Send it later"], "correct": 1},
-        {"q": "What is a common sign of a scam investment?", "a": ["Guaranteed huge profits", "Long research process", "Low risk"], "correct": 0}
+        {"q": "What is phishing?", "a": ["Fake messages or websites used to steal information", "Fishing hobby", "Banking service"], "correct": 0, "explanation": "Phishing is a method where scammers try to trick you into revealing sensitive info like passwords or credit card numbers."},
+        {"q": "What should you do if someone asks for your password?", "a": ["Share it", "Never share it", "Send it later"], "correct": 1, "explanation": "Your password is your private key to your accounts. Legitimate companies will never ask for it."},
+        {"q": "What is a common sign of a scam investment?", "a": ["Guaranteed huge profits", "Long research process", "Low risk"], "correct": 0, "explanation": "If it sounds too good to be true, it probably is. No legitimate investment can guarantee massive, risk-free profits."}
     ]
 },
 
@@ -209,9 +209,9 @@ Over time, savings can help people achieve important life goals."""
     ],
 
     "quiz": [
-        {"q": "What is budgeting?", "a": ["A plan for managing money", "A type of game", "A loan system"], "correct": 0},
-        {"q": "Why track expenses?", "a": ["To understand spending habits", "To waste time", "To increase spending"], "correct": 0},
-        {"q": "What are needs?", "a": ["Essential things for survival", "Luxury items", "Entertainment"], "correct": 0}
+        {"q": "What is budgeting?", "a": ["A plan for managing money", "A type of game", "A loan system"], "correct": 0, "explanation": "Budgeting is simply a plan for every rupee you earn and spend."},
+        {"q": "Why track expenses?", "a": ["To understand spending habits", "To waste time", "To increase spending"], "correct": 0, "explanation": "Tracking shows you exactly where your money is going, helping you cut down on 'leakage'."},
+        {"q": "What are needs?", "a": ["Essential things for survival", "Luxury items", "Entertainment"], "correct": 0, "explanation": "Needs are things you can't live without, like food and shelter."}
     ]
 },
 
@@ -238,8 +238,8 @@ Second, companies sometimes pay dividends."""
     ],
 
     "quiz": [
-        {"q": "What does owning a stock mean?", "a": ["Owning part of a company", "Loan to bank", "Free product"], "correct": 0},
-        {"q": "What is a dividend?", "a": ["Company profit shared with investors", "Tax payment", "Loan repayment"], "correct": 0}
+        {"q": "What does owning a stock mean?", "a": ["Owning part of a company", "Loan to bank", "Free product"], "correct": 0, "explanation": "A stock is essentially a tiny piece of a company. You're an owner!"},
+        {"q": "What is a dividend?", "a": ["Company profit shared with investors", "Tax payment", "Loan repayment"], "correct": 0, "explanation": "Dividends are payments made by a corporation to its shareholders out of its profits."}
     ]
 },
 
@@ -308,8 +308,8 @@ Wealth building requires patience, planning, and responsible budgeting."""
 ],
 
 "quiz":[
-{"q":"What does the 20% in the 50-30-20 rule represent?","a":["Savings and investments","Entertainment","Food"],"correct":0},
-{"q":"What is an emergency fund used for?","a":["Unexpected expenses","Shopping","Entertainment"],"correct":0}
+{"q":"What does the 20% in the 50-30-20 rule represent?","a":["Savings and investments","Entertainment","Food"],"correct":0, "explanation": "The last 20% of your income should go toward financial goals: debt payoff and savings."},
+{"q":"What is an emergency fund used for?","a":["Unexpected expenses","Shopping","Entertainment"],"correct":0, "explanation": "An emergency fund is for true surprises, like a medical bill or a broken phone."}
 ]
 },
 
@@ -378,7 +378,7 @@ Learning these skills helps individuals build long-term financial stability."""
 ],
 
 "quiz":[
-{"q":"What are taxes used for?","a":["Funding public services","Personal savings","Entertainment"],"correct":0},
+{"q":"What are taxes used for?","a":["Funding public services","Personal savings","Entertainment"],"correct":0, "explanation": "Taxes pay for things we all use, like roads, hospitals, and schools."}
 ]
 },
 
@@ -391,8 +391,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Landing Your First Client", "content": "Finding clients takes persistence. Start by setting up profiles on freelance marketplaces like Upwork, Fiverr, or Freelancer. Alternatively, reach out to local businesses (like restaurants or gyms) that have outdated websites. Offer them a discounted rate for your first project."}
     ],
     "quiz": [
-        {"q": "What is the most important asset for a freelance developer?", "a": ["A strong portfolio", "An expensive laptop", "A business suit"], "correct": 0},
-        {"q": "Where can you host your web projects for free?", "a": ["GitHub and Netlify", "Microsoft Word", "Your local hard drive"], "correct": 0}
+        {"q": "What is the most important asset for a freelance developer?", "a": ["A strong portfolio", "An expensive laptop", "A business suit"], "correct": 0, "explanation": "Clients want to see what you've built. Portfolios prove your skills."},
+        {"q": "Where can you host your web projects for free?", "a": ["GitHub and Netlify", "Microsoft Word", "Your local hard drive"], "correct": 0, "explanation": "Many modern platforms offer free hosting for developer projects."}
     ]
 },
 
@@ -405,8 +405,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Showcasing Your Art", "content": "Create a visual portfolio on platforms like Behance, Dribbble, or Instagram. Post your work consistently and engage with other designers. When pitching to clients, tailor your portfolio to show designs relevant to their industry (e.g., modern logos for tech startups)."}
     ],
     "quiz": [
-        {"q": "Which of these is a fundamental design principle?", "a": ["Alignment", "Typing speed", "File size"], "correct": 0},
-        {"q": "Which tool is commonly used by UI/UX designers?", "a": ["Figma", "Excel", "Notepad"], "correct": 0}
+        {"q": "Which of these is a fundamental design principle?", "a": ["Alignment", "Typing speed", "File size"], "correct": 0, "explanation": "Alignment helps create a sense of order and structure in a design."},
+        {"q": "Which tool is commonly used by UI/UX designers?", "a": ["Figma", "Excel", "Notepad"], "correct": 0, "explanation": "Figma is a collaborative interface design tool widely used in tech."}
     ]
 },
 
@@ -419,8 +419,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Pitching to Clients", "content": "Start by publishing your writing on platforms like Medium or your own blog to build a portfolio. Join job boards like ProBlogger or pitch directly to editors of digital publications. A good pitch is short, includes your best writing samples, and explains how your article will benefit their specific audience."}
     ],
     "quiz": [
-        {"q": "What does SEO stand for?", "a": ["Search Engine Optimization", "Super Effective Organization", "Standard English Output"], "correct": 0},
-        {"q": "Why is finding a niche important?", "a": ["It makes you an expert in a specific field", "It is easier to type", "It costs less"], "correct": 0}
+        {"q": "What does SEO stand for?", "a": ["Search Engine Optimization", "Super Effective Organization", "Standard English Output"], "correct": 0, "explanation": "SEO is the practice of increasing the quantity and quality of traffic to your website through organic search engine results."},
+        {"q": "Why is finding a niche important?", "a": ["It makes you an expert in a specific field", "It is easier to type", "It costs less"], "correct": 0, "explanation": "Being an expert allows you to charge more and deliver better content."}
     ]
 },
 
@@ -433,8 +433,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Building Student Loyalty", "content": "Patience and clear communication are key. Prepare lesson plans in advance and track your student's progress. Encourage a positive learning environment by celebrating small victories. A satisfied student often leads to long-term work and referrals to other parents."}
     ],
     "quiz": [
-        {"q": "What is essential for an online tutoring setup?", "a": ["A quiet environment and good internet", "Loud music", "A television"], "correct": 0},
-        {"q": "How can you build student loyalty?", "a": ["By tracking progress and showing patience", "By ending sessions early", "By giving them no homework"], "correct": 0}
+        {"q": "What is essential for an online tutoring setup?", "a": ["A quiet environment and good internet", "Loud music", "A television"], "correct": 0, "explanation": "Clarity is key. Students need to hear and see you without distractions."},
+        {"q": "How can you build student loyalty?", "a": ["By tracking progress and showing patience", "By ending sessions early", "By giving them no homework"], "correct": 0, "explanation": "Helping students see their own progress builds trust and confidence."}
     ]
 },
 
@@ -447,8 +447,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Growing a Brand", "content": "Businesses hire social media managers to grow their audience and drive sales. Focus on community engagement—reply to comments, participate in trends, and collaborate with other creators. Building a loyal community is more valuable than just getting viral views."}
     ],
     "quiz": [
-        {"q": "Why is consistency important in social media?", "a": ["It keeps the audience engaged and satisfies algorithms", "It uses up data", "It annoys followers"], "correct": 0},
-        {"q": "What is a Content Calendar used for?", "a": ["Planning and scheduling posts in advance", "Tracking your physical workouts", "Recording expenses"], "correct": 0}
+        {"q": "Why is consistency important in social media?", "a": ["It keeps the audience engaged and satisfies algorithms", "It uses up data", "It annoys followers"], "correct": 0, "explanation": "Algorithms reward regular posters, and audiences like predictable schedules."},
+        {"q": "What is a Content Calendar used for?", "a": ["Planning and scheduling posts in advance", "Tracking your physical workouts", "Recording expenses"], "correct": 0, "explanation": "Organization prevents last-minute panics and ensures a variety of content."}
     ]
 },
 
@@ -461,8 +461,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Finding VA Opportunities", "content": "Join Facebook groups specifically for entrepreneurs or VAs where clients frequently post jobs. You can also create profiles on Upwork or Fiverr. Start by offering basic admin packages, and as you gain experience, you can offer premium services like market research or bookkeeping."}
     ],
     "quiz": [
-        {"q": "What is a core skill for a Virtual Assistant?", "a": ["Extreme organization", "Physical strength", "Cooking ability"], "correct": 0},
-        {"q": "Which tools should a VA master?", "a": ["Google Workspace and project management apps", "Video games", "Video editing software"], "correct": 0}
+        {"q": "What is a core skill for a Virtual Assistant?", "a": ["Extreme organization", "Physical strength", "Cooking ability"], "correct": 0, "explanation": "Being organized is the #1 job description for a VA. Clients pay for your orderliness."},
+        {"q": "Which tools should a VA master?", "a": ["Google Workspace and project management apps", "Video games", "Video editing software"], "correct": 0, "explanation": "VAs must be experts in the 'office' tools of the digital world."}
     ]
 },
 
@@ -474,8 +474,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "High Yield vs Standard Accounts", "content": "A high-yield savings account offers a significantly higher interest rate than a standard checking account. If you're saving for something more than a few months away, this is where your money should sit."}
     ],
     "quiz": [
-        {"q": "What is compound interest?", "a": ["Interest on both original money and accumulated interest", "A type of loan", "A bank fee"], "correct": 0},
-        {"q": "Where should you keep long-term savings?", "a": ["High-yield savings account", "Under the mattress", "Regular checking account"], "correct": 0}
+        {"q": "What is compound interest?", "a": ["Interest on both original money and accumulated interest", "A type of loan", "A bank fee"], "correct": 0, "explanation": "Einstein called compound interest the 'eighth wonder of the world'."},
+        {"q": "Where should you keep long-term savings?", "a": ["High-yield savings account", "Under the mattress", "Regular checking account"], "correct": 0, "explanation": "High-yield accounts keep your money working for you."}
     ]
 },
 
@@ -487,8 +487,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Hidden Fees", "content": "Banks sometimes charge maintenance fees, overdraft fees, or ATM fees. Always read the terms when opening an account. Look for student or teen accounts that waive these fees."}
     ],
     "quiz": [
-        {"q": "What is a checking account primarily used for?", "a": ["Daily transactions and spending", "Earning high interest", "Retirement savings"], "correct": 0},
-        {"q": "What should you watch out for when opening a bank account?", "a": ["Hidden fees like maintenance and overdrafts", "Free lollipops", "The color of the bank"], "correct": 0}
+        {"q": "What is a checking account primarily used for?", "a": ["Daily transactions and spending", "Earning high interest", "Retirement savings"], "correct": 0, "explanation": "Checking is for 'in and out' money."},
+        {"q": "What should you watch out for when opening a bank account?", "a": ["Hidden fees like maintenance and overdrafts", "Free lollipops", "The color of the bank"], "correct": 0, "explanation": "Fees can eat up your balance. Always look for free accounts."}
     ]
 },
 
@@ -500,8 +500,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Setting up Secure PINs", "content": "Your UPI PIN is like your ATM PIN. Never share it, not even with the bank. If an app asks you to enter your PIN to 'receive' money, IT IS A SCAM. You only enter pins to SEND money."}
     ],
     "quiz": [
-        {"q": "Do you need to enter your UPI PIN to RECEIVE money?", "a": ["No, never. If asked, it's a scam.", "Yes, always.", "Only for large amounts."], "correct": 0},
-        {"q": "What does UPI do?", "a": ["Instant money transfers between bank accounts", "Generates cash", "Prints receipts"], "correct": 0}
+        {"q": "Do you need to enter your UPI PIN to RECEIVE money?", "a": ["No, never. If asked, it's a scam.", "Yes, always.", "Only for large amounts."], "correct": 0, "explanation": "Receiving money is passive. If you have to enter a PIN, you are authorising a *send* transaction."},
+        {"q": "What does UPI do?", "a": ["Instant money transfers between bank accounts", "Generates cash", "Prints receipts"], "correct": 0, "explanation": "UPI connects banks directly to your phone for instant payments."}
     ]
 },
 
@@ -513,8 +513,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Credit Scores", "content": "Your credit score is a number that shows banks how reliable you are at paying back debt. Paying your credit card on time builds a good score, making it easier to get cheap loans for cars or houses later in life."}
     ],
     "quiz": [
-        {"q": "What happens if you don't pay a credit card bill on time?", "a": ["You get charged high interest and your credit score drops", "Nothing happens", "The bank gives you more money"], "correct": 0},
-        {"q": "What is a credit score?", "a": ["A number showing how reliable you are with debt", "Your exam grades", "Your follower count"], "correct": 0}
+        {"q": "What happens if you don't pay a credit card bill on time?", "a": ["You get charged high interest and your credit score drops", "Nothing happens", "The bank gives you more money"], "correct": 0, "explanation": "Credit cards are high-interest debt. Always pay in full every month."},
+        {"q": "What is a credit score?", "a": ["A number showing how reliable you are with debt", "Your exam grades", "Your follower count"], "correct": 0, "explanation": "Financial institutions use this 'grade' to decide if they should lend to you."}
     ]
 },
 
@@ -526,8 +526,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Time vs Value", "content": "When starting a side hustle, consider if you are trading time for money (like tutoring hourly) or creating value (like selling a digital course that can be bought many times without extra work). Both are valid but scale differently."}
     ],
     "quiz": [
-        {"q": "What is a side hustle?", "a": ["Extra work outside primary commitments to make money", "A type of dance", "A banking term"], "correct": 0},
-        {"q": "Which is an example of creating value that scales?", "a": ["Making a digital course once and selling it infinitely", "Walking dogs by the hour", "Mowing lawns"], "correct": 0}
+        {"q": "What is a side hustle?", "a": ["Extra work outside primary commitments to make money", "A type of dance", "A banking term"], "correct": 0, "explanation": "It's an additional income stream usually based on your skills or hobbies."},
+        {"q": "Which is an example of creating value that scales?", "a": ["Making a digital course once and selling it infinitely", "Walking dogs by the hour", "Mowing lawns"], "correct": 0, "explanation": "Selling a product (digital or physical) doesn't limit you by the hours in a day."}
     ]
 },
 
@@ -539,8 +539,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "SIPs (Systematic Investment Plans)", "content": "An SIP is a method where you invest a fixed, small amount of money into a mutual fund every month instead of one huge amount. It helps balance out the highs and lows of the market over time."}
     ],
     "quiz": [
-        {"q": "Why are mutual funds less risky than picking a single stock?", "a": ["Because they are diversified across many companies", "Because the government guarantees them", "Because they don't involve money"], "correct": 0},
-        {"q": "What is an SIP?", "a": ["Investing a fixed amount regularly every month", "A quick rich scheme", "A type of debit card"], "correct": 0}
+        {"q": "Why are mutual funds less risky than picking a single stock?", "a": ["Because they are diversified across many companies", "Because the government guarantees them", "Because they don't involve money"], "correct": 0, "explanation": "Diversification spreads your risk. If one company in the fund fails, 99 others are still there."},
+        {"q": "What is an SIP?", "a": ["Investing a fixed amount regularly every month", "A quick rich scheme", "A type of debit card"], "correct": 0, "explanation": "SIPs make investing automatic and disciplined."}
     ]
 },
 
@@ -552,8 +552,8 @@ Learning these skills helps individuals build long-term financial stability."""
         {"title": "Diversification", "content": "Don't put all your eggs in one basket. Risk management means spreading your money across different types of investments (savings accounts, mutual funds, gold) so that if one sector crashes, you don't lose everything."}
     ],
     "quiz": [
-        {"q": "What does diversification mean in finance?", "a": ["Spreading money across multiple investments to reduce risk", "Putting all money in one stock", "Hiding money in different rooms"], "correct": 0},
-        {"q": "If an investment promises massive returns with zero risk, what is it likely?", "a": ["A scam or highly misleading", "A safe choice", "A government program"], "correct": 0}
+        {"q": "What does diversification mean in finance?", "a": ["Spreading money across multiple investments to reduce risk", "Putting all money in one stock", "Hiding money in different rooms"], "correct": 0, "explanation": "Diversification is the most important tool for managing investment risk."},
+        {"q": "If an investment promises massive returns with zero risk, what is it likely?", "a": ["A scam or highly misleading", "A safe choice", "A government program"], "correct": 0, "explanation": "High reward ALWAYS comes with high risk. Always."}
     ]
 }
 

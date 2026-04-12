@@ -141,6 +141,30 @@
                 <!-- Topics injected dynamically -->
             </div>
 
+            <!-- Scam Detective Game Section -->
+            <div id="scam-game-section" style="display: none; margin-top: 2rem;">
+                <div class="glass-card" style="text-align: center; border: 2px solid var(--primary); padding: 2rem;">
+                    <h2 class="text-gradient" style="font-size: 2rem; margin-bottom: 1rem;"><i class="fas fa-user-secret"></i> Scam Detective</h2>
+                    <p style="margin-bottom: 2rem;">Analyze the scenario below. Is it a <strong>SCAM</strong> or <strong>REAL</strong>?</p>
+                    
+                    <div id="scam-scenario-card" class="lesson-topic-card visible" style="min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <span id="scam-type" class="badge badge-primary" style="margin-bottom: 1rem;">Type</span>
+                        <p id="scam-text" style="font-size: 1.2rem; font-weight: 500; line-height: 1.6; color: white;"></p>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                        <button onclick="handleScamChoice(true)" class="btn btn-secondary" style="background: #ef4444; border: none; padding: 1.2rem 2.5rem;"><i class="fas fa-exclamation-triangle"></i> IT'S A SCAM</button>
+                        <button onclick="handleScamChoice(false)" class="btn btn-secondary" style="background: #10b981; border: none; padding: 1.2rem 2.5rem;"><i class="fas fa-check-circle"></i> IT'S REAL</button>
+                    </div>
+
+                    <div id="scam-feedback" style="display: none; margin-top: 2rem; padding: 1.5rem; border-radius: 15px; text-align: left;">
+                        <h3 id="scam-feedback-title" style="margin-bottom: 0.5rem;"></h3>
+                        <p id="scam-feedback-text"></p>
+                        <button id="next-scam-btn" class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;">Next Scenario</button>
+                    </div>
+                </div>
+            </div>
+
             <div id="quiz-section" style="display: none; margin-top: 3rem;">
                 <h2 style="font-size: 1.8rem; color: white; margin-bottom: 1rem; text-align: center;"><i class="fas fa-brain"></i> Knowledge Check</h2>
                 <div id="quiz-container">
@@ -170,6 +194,8 @@
         let currentLesson = null;
         let visibleSections = 0;
         let totalSections = 0;
+        let scamIndex = 0;
+        let scamScore = 0;
 
         async function loadLesson() {
             if (lessonId === 'ai_generated_lesson') {
@@ -192,9 +218,18 @@
                 }
             }
 
+            // CSRF Token Setup for API calls
+            try {
+                const csrfRes = await fetch('/api/csrf_token');
+                const csrfData = await csrfRes.json();
+                window.csrfToken = csrfData.csrf_token;
+            } catch (e) {
+                console.error("Failed to fetch CSRF token", e);
+            }
+
             document.getElementById('lesson-title').textContent = currentLesson.title;
             const contentDiv = document.getElementById('lesson-content');
-            totalSections = currentLesson.topics.length + 1; // +1 for the quiz
+            totalSections = currentLesson.topics.length + (currentLesson.scam_game ? 1 : 1); // +1 game or quiz
 
             currentLesson.topics.forEach((topic, idx) => {
                 const div = document.createElement('div');
@@ -206,6 +241,10 @@
                 `;
                 contentDiv.appendChild(div);
             });
+
+            if (currentLesson.scam_game) {
+                totalSections = currentLesson.topics.length + 1;
+            }
 
             renderQuiz();
 
@@ -221,16 +260,77 @@
                 updateProgress();
                 
                 if (visibleSections === currentLesson.topics.length) {
-                    document.getElementById('continue-btn').textContent = "Start Quiz";
+                    document.getElementById('continue-btn').textContent = currentLesson.scam_game ? "Start Scam Detective" : "Start Quiz";
                 }
             } else {
                 document.getElementById('continue-btn').style.display = 'none';
-                document.getElementById('quiz-section').style.display = 'block';
-                document.getElementById('submit-quiz').style.display = 'block';
+                if (currentLesson.scam_game) {
+                    document.getElementById('scam-game-section').style.display = 'block';
+                    loadScamScenario();
+                } else {
+                    document.getElementById('quiz-section').style.display = 'block';
+                    document.getElementById('submit-quiz').style.display = 'block';
+                }
                 visibleSections++;
                 updateProgress();
             }
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        // --- Scam Game Logic ---
+        function loadScamScenario() {
+            const scenario = currentLesson.scam_game[scamIndex];
+            document.getElementById('scam-type').textContent = scenario.type;
+            document.getElementById('scam-text').textContent = scenario.scenario;
+            document.getElementById('scam-feedback').style.display = 'none';
+            document.getElementById('scam-scenario-card').style.display = 'flex';
+        }
+
+        window.handleScamChoice = function(userSaidScam) {
+            const scenario = currentLesson.scam_game[scamIndex];
+            const isCorrect = userSaidScam === scenario.is_scam;
+            if (isCorrect) scamScore++;
+
+            const feedbackDiv = document.getElementById('scam-feedback');
+            const feedbackTitle = document.getElementById('scam-feedback-title');
+            const feedbackText = document.getElementById('scam-feedback-text');
+            const nextBtn = document.getElementById('next-scam-btn');
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.style.background = isCorrect ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+            feedbackDiv.style.border = `1px solid ${isCorrect ? '#10b981' : '#ef4444'}`;
+            
+            feedbackTitle.textContent = isCorrect ? (scenario.is_scam ? 'Correct! It was a SCAM.' : 'Correct! It was REAL.') : 'Incorrect!';
+            feedbackTitle.style.color = isCorrect ? '#10b981' : '#ef4444';
+            feedbackText.textContent = scenario.explanation;
+
+            if (scamIndex === currentLesson.scam_game.length - 1) {
+                nextBtn.textContent = "Finish Game";
+                nextBtn.onclick = () => finishScamGame();
+            } else {
+                nextBtn.onclick = () => {
+                    scamIndex++;
+                    loadScamScenario();
+                };
+            }
+        }
+
+        async function finishScamGame() {
+            const finalScore = Math.round((scamScore / currentLesson.scam_game.length) * 100);
+            alert(`Game Over! You identified ${scamScore}/${currentLesson.scam_game.length} correctly. Score: ${finalScore}%`);
+            
+            try {
+                const res = await API.learning.completeLesson({ 
+                    module_name: lessonId, 
+                    score: finalScore 
+                }, window.csrfToken);
+                
+                document.getElementById('xp-text').textContent = `+${res.earned_xp || 50} XP`;
+                document.getElementById('xp-overlay').classList.add('active');
+            } catch (err) {
+                console.error(err);
+                document.getElementById('xp-overlay').classList.add('active');
+            }
         }
 
         function updateProgress() {
@@ -241,6 +341,7 @@
         document.getElementById('continue-btn').addEventListener('click', showNextSection);
 
         function renderQuiz() {
+            if (!currentLesson.quiz) return;
             const container = document.getElementById('quiz-container');
             container.innerHTML = currentLesson.quiz.map((q, qIndex) => `
                 <div class="lesson-topic-card visible" style="margin-bottom: 1.5rem;" id="quiz-block-${qIndex}">
@@ -254,20 +355,18 @@
                             </label>
                         `).join('')}
                     </div>
+                    <div id="explanation-${qIndex}" style="display:none; margin-top:1rem; padding:1rem; border-radius:10px; background:rgba(255,255,255,0.05); font-size:0.9rem; color:#94a3b8; border-left:4px solid var(--primary);"></div>
                 </div>
             `).join('');
         }
 
         window.selectOption = function(qIndex, oIndex) {
-            // Remove selection from others
             document.querySelectorAll(`input[name="q${qIndex}"]`).forEach(input => {
                 const parent = input.closest('.quiz-option');
                 parent.style.borderColor = 'transparent';
                 parent.style.background = 'rgba(255,255,255,0.05)';
                 parent.querySelector('.radio-circle').style.background = 'transparent';
             });
-            
-            // Highlight selected
             const selected = document.getElementById(`opt-${qIndex}-${oIndex}`);
             selected.style.borderColor = '#a855f7';
             selected.style.background = 'rgba(168, 85, 247, 0.1)';
@@ -289,6 +388,11 @@
             answers.forEach((ans, i) => {
                 const correct = currentLesson.quiz[i].correct;
                 const optionDiv = document.getElementById(`opt-${i}-${ans}`);
+                const expDiv = document.getElementById(`explanation-${i}`);
+                
+                expDiv.style.display = 'block';
+                expDiv.textContent = currentLesson.quiz[i].explanation || "No explanation available.";
+
                 if (ans === correct) {
                     correctCount++;
                     optionDiv.classList.add('correct');
@@ -296,33 +400,26 @@
                 } else {
                     optionDiv.classList.add('wrong');
                     optionDiv.innerHTML += ' <i class="fas fa-times" style="margin-left:auto;"></i>';
-                    // Highlight correct one
                     const correctDiv = document.getElementById(`opt-${i}-${correct}`);
                     correctDiv.classList.add('correct');
                 }
             });
 
             document.getElementById('submit-quiz').style.display = 'none';
-
             const score = Math.round((correctCount / currentLesson.quiz.length) * 100);
 
             setTimeout(async () => {
-                if (score >= 50) { // Duolingo is forgiving, you just need mostly right or passing
+                if (score >= 50) {
                     try {
-                        let res;
-                        if (lessonId !== 'ai_generated_lesson') {
-                            res = await API.learning.completeLesson({ module_name: lessonId, score: score });
-                        } else {
-                            // Dummy complete for AI lesson logic so user gets XP
-                            res = await API.learning.completeLesson({ module_name: "ai_bonus", score: score });
-                        }
+                        const res = await API.learning.completeLesson({ 
+                            module_name: lessonId === 'ai_generated_lesson' ? 'ai_bonus' : lessonId, 
+                            score: score 
+                        }, window.csrfToken);
                         
                         document.getElementById('xp-text').textContent = `+${res.earned_xp || 50} XP`;
                         document.getElementById('xp-overlay').classList.add('active');
-                        // Celebrate!
                     } catch (err) {
                         console.error(err);
-                        alert('Could not sync progress, but lesson is done!');
                         document.getElementById('xp-overlay').classList.add('active');
                     }
                 } else {
@@ -331,7 +428,7 @@
                     document.getElementById('continue-btn').textContent = "Retry Quiz";
                     document.getElementById('continue-btn').onclick = () => location.reload();
                 }
-            }, 1500);
+            }, 2500);
         });
 
         loadLesson();

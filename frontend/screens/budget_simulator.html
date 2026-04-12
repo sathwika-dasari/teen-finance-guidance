@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Simulator - Teen Finance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        @media (max-width: 768px) {
+            .simulator-grid { grid-template-columns: 1fr; }
+        }
+        .control-group { margin-bottom: 2rem; }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="logo" onclick="window.location.href='/home'">
+            <i class="fas fa-rocket"></i> Teen<span>Finance</span>
+        </div>
+        <a href="/dashboard" class="btn btn-secondary btn-sm">Back to Hub</a>
+    </nav>
+
+    <main class="layout-container">
+        <h1 class="text-gradient">Budget Simulator</h1>
+        <p>Experiment with your income and expenses to see how much you can save!</p>
+
+        <div class="simulator-grid">
+            <div class="glass-card">
+                <h2>Variables</h2>
+                
+                <div class="control-group">
+                    <div class="slider-label">
+                        <span>Monthly Income (₹)</span>
+                        <span id="income-val">5000</span>
+                    </div>
+                    <input type="range" id="income" min="1000" max="50000" step="500" value="5000">
+                </div>
+
+                <div class="control-group">
+                    <div class="slider-label">
+                        <span>Savings Goal (₹)</span>
+                        <span id="goal-val">10000</span>
+                    </div>
+                    <input type="range" id="goal" min="5000" max="100000" step="1000" value="10000">
+                </div>
+
+                <hr style="opacity: 0.1; margin: 2rem 0;">
+                <h3>Expenses</h3>
+
+                <div class="control-group">
+                    <div class="slider-label">
+                        <span>Food & Snacks (₹)</span>
+                        <span id="food-val">1000</span>
+                    </div>
+                    <input type="range" id="food" min="0" max="10000" step="100" value="1000">
+                </div>
+
+                <div class="control-group">
+                    <div class="slider-label">
+                        <span>Entertainment (₹)</span>
+                        <span id="fun-val">500</span>
+                    </div>
+                    <input type="range" id="fun" min="0" max="10000" step="100" value="500">
+                </div>
+
+                <div class="control-group">
+                    <div class="slider-label">
+                        <span>Transport (₹)</span>
+                        <span id="transport-val">300</span>
+                    </div>
+                    <input type="range" id="transport" min="0" max="5000" step="100" value="300">
+                </div>
+
+                <div class="control-group">
+                    <div class="slider-label">
+                        <span>Others (₹)</span>
+                        <span id="misc-val">200</span>
+                    </div>
+                    <input type="range" id="misc" min="0" max="5000" step="50" value="200">
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <h2>12-Month Projection</h2>
+                <div style="height: 300px; width: 100%;">
+                    <canvas id="projectionChart"></canvas>
+                </div>
+                
+                <div id="result-summary" style="margin-top: 2rem; padding: 1.5rem; border-radius: 15px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2);">
+                    <h3 id="result-title">On Track!</h3>
+                    <p id="result-desc"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const inputs = ['income', 'goal', 'food', 'fun', 'transport', 'misc'];
+        let chart = null;
+
+        function updateValues() {
+            inputs.forEach(id => {
+                document.getElementById(id + '-val').textContent = document.getElementById(id).value;
+            });
+            calculate();
+        }
+
+        function calculate() {
+            const income = parseInt(document.getElementById('income').value);
+            const goal = parseInt(document.getElementById('goal').value);
+            const food = parseInt(document.getElementById('food').value);
+            const fun = parseInt(document.getElementById('fun').value);
+            const transport = parseInt(document.getElementById('transport').value);
+            const misc = parseInt(document.getElementById('misc').value);
+
+            const totalExpenses = food + fun + transport + misc;
+            const monthlySavings = income - totalExpenses;
+            
+            const data = [];
+            const labels = [];
+            let cumulative = 0;
+
+            for (let i = 1; i <= 12; i++) {
+                cumulative += monthlySavings;
+                data.push(Math.max(0, cumulative));
+                labels.push('Month ' + i);
+            }
+
+            renderChart(labels, data, goal);
+            updateSummary(monthlySavings, goal);
+        }
+
+        function renderChart(labels, data, goal) {
+            const ctx = document.getElementById('projectionChart').getContext('2d');
+            
+            if (chart) chart.destroy();
+
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Projected Savings (₹)',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff'
+                    }, {
+                        label: 'Goal (₹)',
+                        data: Array(12).fill(goal),
+                        borderColor: '#10b981',
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#fff', font: { family: 'Inter' } } }
+                    }
+                }
+            });
+        }
+
+        function updateSummary(monthly, goal) {
+            const titleEl = document.getElementById('result-title');
+            const descEl = document.getElementById('result-desc');
+            
+            if (monthly <= 0) {
+                titleEl.textContent = '⚠️ Danger!';
+                titleEl.style.color = '#ef4444';
+                descEl.textContent = 'Your expenses are higher than your income. You won\'t be able to save anything!';
+            } else {
+                const monthsToGoal = Math.ceil(goal / monthly);
+                if (monthsToGoal <= 12) {
+                    titleEl.textContent = '✅ On Track!';
+                    titleEl.style.color = '#10b981';
+                    descEl.textContent = `You will reach your goal of ₹${goal} in ${monthsToGoal} months! Great job!`;
+                } else {
+                    titleEl.textContent = '📈 Needs Adjustment';
+                    titleEl.style.color = '#f59e0b';
+                    descEl.textContent = `At this rate, it will take ${monthsToGoal} months to reach your goal. Try reducing expenses or increasing income.`;
+                }
+            }
+        }
+
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', updateValues);
+        });
+
+        // Initial call
+        updateValues();
+    </script>
+</body>
+</html>

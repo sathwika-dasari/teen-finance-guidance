@@ -1,4 +1,18 @@
 const API_BASE = '';
+let _csrfToken = null;
+
+async function getCSRFToken() {
+    if (_csrfToken) return _csrfToken;
+    try {
+        const response = await fetch('/api/csrf_token');
+        const data = await response.json();
+        _csrfToken = data.csrf_token;
+        return _csrfToken;
+    } catch (e) {
+        console.error("Could not fetch CSRF token", e);
+        return null;
+    }
+}
 
 async function apiRequest(endpoint, method = 'GET', data = null) {
     const options = {
@@ -6,9 +20,15 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'login'.includes('login') ? 'same-origin' : 'include' // safe same-origin
+        credentials: 'same-origin'
     };
-    options.credentials = 'same-origin';
+
+    if (['POST', 'PUT', 'DELETE'].includes(method.toUpperCase())) {
+        const token = await getCSRFToken();
+        if (token) {
+            options.headers['X-CSRFToken'] = token;
+        }
+    }
 
     if (data) {
         options.body = JSON.stringify(data);
@@ -16,9 +36,21 @@ async function apiRequest(endpoint, method = 'GET', data = null) {
 
     try {
         const response = await fetch(`${API_BASE}${endpoint}`, options);
+        
+        // Handle no-content responses (like 204 or logout)
+        if (response.status === 204 || endpoint.includes('logout')) {
+            _csrfToken = null; // Clear token on logout
+            return { message: 'Success' };
+        }
+
         const result = await response.json();
 
         if (!response.ok) {
+            // If CSRF failure, clear token and retry once
+            if (response.status === 400 && result.message === 'The CSRF token is missing.') {
+                _csrfToken = null;
+                return apiRequest(endpoint, method, data);
+            }
             throw new Error(result.message || 'Something went wrong');
         }
 
@@ -52,6 +84,6 @@ const API = {
 
     // ✅ CHATBOT
     chat: {
-        sendMessage: (message) => apiRequest('/chat', 'POST', { message })
+        sendMessage: (message) => apiRequest('/api/chat', 'POST', { message })
     }
 };

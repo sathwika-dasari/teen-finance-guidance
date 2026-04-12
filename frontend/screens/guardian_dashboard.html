@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guardian Dashboard - Teen Finance</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .student-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: transform 0.3s;
+        }
+        .student-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.05);
+            padding: 1rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        .stat-value {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary);
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .module-list {
+            margin-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1rem;
+        }
+        .module-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .link-form {
+            max-width: 500px;
+            margin-bottom: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav-bar">
+        <div class="logo">
+            <i class="fas fa-rocket"></i> Teen<span>Finance</span>
+        </div>
+        <button onclick="logout()" class="btn btn-secondary btn-sm">Log Out</button>
+    </nav>
+
+    <main class="layout-container">
+        <header style="margin-bottom: 3rem;">
+            <h1 class="text-gradient">Guardian Control</h1>
+            <p>Monitor your student's financial literacy journey and progress.</p>
+        </header>
+
+        <section class="glass-card link-form">
+            <h3><i class="fas fa-link"></i> Link a Student</h3>
+            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 1.5rem;">Enter the email your student used to register.</p>
+            <div class="input-group">
+                <input type="email" id="student-email" placeholder="student@email.com">
+                <button onclick="linkStudent()" class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Link Account</button>
+            </div>
+        </section>
+
+        <section id="students-container">
+            <h2 style="margin-bottom: 1.5rem;">Your Linked Students</h2>
+            <div id="students-list">
+                <!-- Students injected here -->
+                <p id="no-students">No students linked yet. Use the form above to get started.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/api.js"></script>
+    <script>
+        async function fetchStudents() {
+            try {
+                const res = await fetch('/api/auth/linked_students');
+                const data = await res.json();
+                renderStudents(data.students);
+            } catch (err) {
+                console.error("Failed to fetch students", err);
+            }
+        }
+
+        function renderStudents(students) {
+            const list = document.getElementById('students-list');
+            if (!students || students.length === 0) {
+                document.getElementById('no-students').style.display = 'block';
+                return;
+            }
+            document.getElementById('no-students').style.display = 'none';
+
+            list.innerHTML = students.map(s => `
+                <div class="student-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3 style="font-size: 1.5rem; color: white;">${s.username}</h3>
+                            <p style="color: #94a3b8;">${s.email}</p>
+                        </div>
+                        <span class="badge badge-primary">Difficulty: ${s.user_difficulty || 'Easy'}</span>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value">${s.xp || 0}</span>
+                            <span class="stat-label">Total XP</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${s.current_streak || 0}</span>
+                            <span class="stat-label">Day Streak</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value">${s.progress ? s.progress.length : 0}</span>
+                            <span class="stat-label">Lessons Done</span>
+                        </div>
+                    </div>
+
+                    <div class="module-list">
+                        <h4>Recent Activities</h4>
+                        ${s.progress && s.progress.length > 0 
+                            ? s.progress.map(p => `
+                                <div class="module-item">
+                                    <span>${p.module_name.replace(/_/g, ' ')}</span>
+                                    <span style="font-weight: 600; color: ${p.score >= 80 ? '#10b981' : '#f59e0b'}">${p.score}%</span>
+                                </div>
+                            `).join('') 
+                            : '<p style="font-size: 0.9rem; color: #64748b; margin-top: 0.5rem;">No lessons completed yet.</p>'
+                        }
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function linkStudent() {
+            const email = document.getElementById('student-email').value;
+            if (!email) return alert("Please enter an email.");
+
+            try {
+                const csrfRes = await fetch('/api/csrf_token');
+                const csrfData = await csrfRes.json();
+
+                const res = await fetch('/api/auth/link_student', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrfData.csrf_token
+                    },
+                    body: JSON.stringify({ student_email: email })
+                });
+                const data = await res.json();
+                alert(data.message);
+                if (res.ok) {
+                    document.getElementById('student-email').value = '';
+                    fetchStudents();
+                }
+            } catch (err) {
+                alert("Failed to link student.");
+            }
+        }
+
+        function logout() {
+            fetch('/api/auth/logout', { method: 'POST' })
+                .then(() => window.location.href = '/login');
+        }
+
+        // Initial fetch
+        fetchStudents();
+    </script>
+</body>
+</html>
