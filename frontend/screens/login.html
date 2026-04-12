@@ -97,6 +97,10 @@
                     <label for="skills">Skills (comma separated)</label>
                     <input type="text" id="skills" placeholder="e.g. Coding, Design, Writing">
                 </div>
+                <div class="input-group" id="email-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="name@example.com">
+                </div>
                 <div class="input-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" required placeholder="••••••••">
@@ -139,6 +143,7 @@
                 submitBtn.textContent = "Log In";
                 ageGroup.style.display = 'none';
                 skillsGroup.style.display = 'none';
+                document.getElementById('email-group').style.display = 'none';
                 switchAuth.textContent = "Sign Up";
                 document.getElementById('switch-text').textContent = "Don't have an account?";
             } else {
@@ -146,6 +151,7 @@
                 submitBtn.textContent = "Register";
                 ageGroup.style.display = 'block';
                 skillsGroup.style.display = 'block';
+                document.getElementById('email-group').style.display = 'block';
                 switchAuth.textContent = "Log In";
                 document.getElementById('switch-text').textContent = "Already have an account?";
             }
@@ -166,7 +172,13 @@
                 } else {
                     const age = document.getElementById('age').value;
                     const skills = document.getElementById('skills').value;
-                    await API.auth.register({ username, password, age, skills });
+                    const email = document.getElementById('email').value;
+                    
+                    if (!email) {
+                        throw new Error("Email is required for registration.");
+                    }
+
+                    await API.auth.register({ username, password, age, skills, email, role: 'student' });
                     alert('Registration successful! Please log in.');
                     switchAuth.click();
                 }
