@@ -4,14 +4,29 @@ import os
 DB_PATH = os.path.join(os.path.dirname(__file__), 'backend', 'database.db')
 
 def migrate():
+    # If the database doesn't exist, create it from schema.sql
     if not os.path.exists(DB_PATH):
-        print(f"Database not found at {DB_PATH}")
-        return
+        print(f"Database not found. Initialising from schema.sql...")
+        schema_path = os.path.join(os.path.dirname(__file__), 'database', 'schema.sql')
+        if not os.path.exists(schema_path):
+             # Try parent directory if running from backend/ or somewhere else
+             schema_path = os.path.join(os.getcwd(), 'database', 'schema.sql')
+        
+        if os.path.exists(schema_path):
+            conn = sqlite3.connect(DB_PATH)
+            with open(schema_path, 'r') as f:
+                conn.executescript(f.read())
+            conn.commit()
+            conn.close()
+            print("Database created and base schema applied.")
+        else:
+            print("ERROR: Could not find schema.sql to initialize database.")
+            return
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
 
-    print("Migrating database...")
+    print("Checking for additional migrations...")
 
     # Add email column to users
     try:

@@ -3,3 +3,5 @@ flask-cors
 gunicorn
 google-genai
 python-dotenv
+Flask-WTF
+flask-limiter

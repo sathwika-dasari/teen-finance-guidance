@@ -21,6 +21,7 @@ from backend.routes.chat_routes import chat_bp
 from backend.models.job_model import JobModel
 
 from backend.extensions import limiter
+from migrate import migrate
 
 app = Flask(__name__, static_folder='../frontend')
 app.config.from_object(Config)
@@ -39,8 +40,9 @@ app.register_blueprint(job_bp, url_prefix='/api/jobs')
 app.register_blueprint(learning_bp, url_prefix='/api/learning')
 app.register_blueprint(chat_bp, url_prefix='/api')
 
-# Seed jobs
+# Seed & Migrate
 with app.app_context():
+    migrate()
     JobModel.seed_sample_jobs()
 
 # CSRF Token endpoint for AJAX apps
